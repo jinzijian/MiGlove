@@ -1,0 +1,300 @@
+affair	causes	divorce	
+affair	causes	scandal	
+age	causes	senesce	
+alarm	causes	danger	
+alcohol	causes	amnesia	
+alcohol	causes	brewer's droop	
+alcohol	causes	do stupid things	
+alcohol	causes	drunkenness	
+alcohol	causes	hangover	
+ambulance	causes	injury	
+anxiety	causes	sleep loss	
+arousal	causes	ejaculation	
+arson	causes	sometimes death	
+assault	causes	felony conviction	
+bad luck	causes	catastrophy	
+bag	causes	travel	
+beer	causes	drunkenness	
+belief	causes	trust	
+big brother	causes	loss of privacy	
+big investment	causes	big loss	
+bigotry	causes	hatred	
+birthday	causes	party	
+blind date	causes	boredom	
+bribe	causes	not guilty verdict	
+bribery	causes	better jobs	
+broad knowledge	causes	lack of depth	
+caffiene	causes	headache to go away	
+caffiene	causes	nervousness	
+call	causes	meet	
+car	causes	pollution	
+car accident	causes	injuries	
+car accident	causes	whiplash	
+car crash	causes	amnesia	
+carelessness	causes	accidents	
+carelessness	causes	injury	
+catherine havasi	causes	openmind	
+censorship	causes	blindness	
+cigarette	causes	fire	
+close call with death	causes	religion	
+cocaine use	causes	addiction	
+coccidiosis	causes	economic loss	
+coccidiosis	causes	infected chickens die	
+coccidiosis	causes	treatment with anticoccidials	
+coffee	causes	insomnia	
+coffin	causes	death	
+cold	causes	goose bumps	
+cold	causes	shivers	
+cold weather	causes	cold	
+cold weather	causes	frostbite	
+cold wind	causes	frozen skin	
+collaboration	causes	progress	
+collaborative effort	causes	major breakthrough	
+conceit	causes	more conversation than wit	
+corruption	causes	death of innocent people	
+creativity	causes	new art forms	
+crime	causes	punishment of offender	
+crisis	causes	focus	
+crown	causes	reign	
+crutch	causes	injury	
+damage	causes	malfunction	
+death of friend	causes	sadness	
+dehydration	causes	death	
+dehydration	causes	thirst	
+democracy	causes	equality for everyone	
+depression	causes	inactivity	
+depression	causes	suicide	
+depth of knowledge	causes	lack of breadth	
+desire	causes	sin	
+detergent	causes	harm to fish	
+diver	causes	splash	
+drought	causes	famine	
+drug use	causes	addiction	
+drug use	causes	memory loss	
+drug use	causes	physical or psychological illness	
+duck	causes	men to shoot guns	
+earthquake	causes	buildings collapsing	
+earthquake	causes	disaster	
+earthquake	causes	ruined streets pipelines and houses	
+earthquake	causes	tsunami	
+electricity	causes	electrocution	
+embarrassment	causes	blushing	
+engine	causes	energy	
+excercising	causes	make fitter	
+excessive sunshine	causes	sunburn	
+exercize	causes	tiredness	
+explosion	causes	death	
+explosion	causes	destruction	
+eye contact	causes	conversation	
+faith	causes	action	
+familiar smell	causes	recollection	
+familiar sound	causes	recollection	
+famine	causes	hunger	
+fatigue	causes	increased error	
+faulty traffic light	causes	car accident	
+faux pa	causes	upset people	
+fever	causes	drowsiness	
+fever	causes	headache	
+fever	causes	higher body temperature	
+fever	causes	increase in body temperature	
+fire	causes	ashes	
+fire	causes	heat	
+fire	causes	pain	
+fire	causes	smoke	
+flame retardant	causes	puts out fires	
+flatulence	causes	awful odors	
+flling	causes	injury	
+flood	causes	disaster	
+fly	causes	float	
+friction	causes	heat	
+funeral	causes	sadness	
+germ	causes	disease	
+give	causes	have	
+goal in football	causes	spectators to go crazy	
+good sex	causes	multiple orgasms	
+gravity	causes	falling	
+gravity	causes	weight	
+grwoing old	causes	getting arthritis	
+guitar	causes	vibration	
+hail	causes	broken windows	
+hammer	causes	nailing	
+happiness	causes	laughter	
+happiness	causes	tears	
+hate	causes	violence	
+hate	causes	war	
+heart attack	causes	dying	
+heat	causes	irritation	
+heat	causes	pain	
+heroin	causes	euphoria	
+high altitude	causes	dizziness	
+high blood pressure	causes	stroke	
+homework	causes	frustration	
+hurricane	causes	disaster	
+hurricane	causes	horrendous	
+hurricane	causes	tornadoes	
+icy road	causes	accident	
+ignorance	causes	accidents	
+ignorance	causes	bliss	
+ignorance	causes	hostility	
+impatience	causes	frustration	
+inability to breath	causes	asphyxiation	
+infection	causes	death	
+infection	causes	malfunction	
+infidelity	causes	divorce	
+information	causes	understanding	
+injesting poison	causes	death	
+injury	causes	pain	
+insomnia	causes	one to fall asleep while driving	
+instrument	causes	job	
+insufficient sleep	causes	automobile accidents	
+insufficient sleep	causes	headaches	
+insult	causes	hurt feelings	
+intense heat	causes	pain	
+intercorse	causes	orgasms	
+intimacy	causes	affection	
+intoxication	causes	regret	
+inventive mind	causes	fresh ideas	
+irc	causes	addiction	
+irs	causes	suicides	
+jealousy	causes	deaths	
+jesse	causes	happiness	
+job	causes	stress	
+joke	causes	laughter	
+keyboard use	causes	carpal tunnel syndrome	
+kising	causes	illness	
+kkk	causes	hate crimes	
+lack of sleep	causes	have short fuse	
+laughter	causes	happiness	
+lawsuit	causes	stress	
+laziness	causes	inventions	
+leak	causes	break	
+life	causes	poop	
+lift	causes	rise	
+light bulb	causes	illumination	
+light match	causes	start fire	
+lightning	causes	thunder	
+loneliness	causes	dispair	
+lot of snow	causes	school to canceled	
+loud music	causes	hearing loss	
+loud sound	causes	ringing in ears	
+marijuana	causes	subjective change in consciousness	
+marijuana use	causes	short term memory loss	
+match	causes	fire	
+match	causes	friction	
+medication	causes	allergic reaction	
+medication	causes	unexpected side effects	
+meditation	causes	clear mind	
+meditation	causes	peace of mind	
+meditation	causes	subjective change in consciousness	
+mental illness	causes	change in thinking feeling and behaviour	
+mental illness	causes	difficulty coping	
+mental illness	causes	difficulty finding employment or getting promotion	
+mental illness	causes	disturbing and overwhelming feelings	
+mental illness	causes	losing contact with family and friends	
+mental illness	causes	prejudice	
+mental illness	causes	seriously impairing mental function	
+mine	causes	contact	
+moisture	causes	damage	
+moisture	causes	dampness	
+money	causes	greed	
+noise	causes	headaches to get worse	
+nuclear war	causes	death	
+old age	causes	bald	
+old injury	causes	arthritis	
+overpopulation	causes	famine	
+overpopulation	causes	food shortages	
+overpopulation	causes	loneliness	
+oxygen	causes	corrosion	
+pack	causes	throng	
+pain	causes	fear	
+pain	causes	unhappiness	
+pain	causes	suffer	
+pepper	causes	sneezing	
+perfection	causes	jealousy	
+plastic surgery	causes	looking better	
+please	causes	like	
+poison	causes	death	
+pressure	causes	osmosis	
+produce	causes	appear	
+puberty	causes	biological changes	
+puberty	causes	pms	
+puberty	causes	sexual maturity	
+puppy	causes	soiled carpet	
+purity	causes	distrust	
+rain	causes	flooding	
+rain	causes	floods	
+rain	causes	flowers to bloom	
+rain	causes	making ground wet	
+rain	causes	water crops	
+raise	causes	rise	
+religion	causes	war	
+religion	causes	wars	
+religious experience	causes	subjective change in consciousness	
+resuscitation	causes	life	
+robbery	causes	missing belongings	
+robbery	causes	terror	
+rock salt	causes	melt snow and ice	
+schizophrenia	causes	stigma	
+season	causes	taste	
+seat	causes	sit	
+sex	causes	burning calories	
+sex	causes	children	
+sex	causes	herpes	
+sex	causes	orgasm	
+sex	causes	pregnancy	
+sex	causes	rug burn	
+sex	causes	unwanted pregnancies	
+sex	causes	venereal disease	
+sex	causes	venerial decease	
+sex in toilet	causes	sexually transmitted disease	
+sexual arousal	causes	erection	
+sexual stimulation	causes	orgasm	
+shave	causes	bald	
+show	causes	see	
+sin	causes	death	
+skin cream	causes	irritation	
+smoke	causes	smoke inhalation	
+smoke	causes	trigger smoke alarm	
+snowstorm	causes	bad roads	
+soap	causes	harm to fish	
+solar eclipse	causes	darkness	
+solar eclipse	causes	scaring superstitious people	
+spark	causes	fire	
+sport	causes	injury	
+starvation	causes	death	
+starvation	causes	hunger	
+stigma	causes	being subjected to physical violence or harassment	
+stigma	causes	difficulty finding housing	
+stigma	causes	discrimination	
+stigma	causes	fear mistrust and violence	
+stigma	causes	inadequate health insurance coverage of mental illnesses	
+stigma	causes	prejudice and discrimination	
+stigma	causes	refusal to seek treatment	
+stigma	causes	rejection by family and friends	
+stigma	causes	trying to pretend nothing wrong	
+stigma	causes	work problems or discrimination	
+stress	causes	depression	
+stress	causes	fatigue	
+stress	causes	headache	
+stress	causes	heart attacks	
+stress	causes	ulcers	
+strobe light	causes	epileptic seizures	
+struggle	causes	building strength	
+study	causes	knowledge	
+subject	causes	experience	
+subjective change in consciousness	causes	feeling different	
+subjective change in consciousness	causes	thinking differently	
+sugar	causes	cavities	
+sun	causes	heat	
+sun	causes	life on earth	
+sun	causes	light	
+sun	causes	sun tan	
+sun	causes	sunburns	
+sun	causes	wrinkles	
+sun exposure	causes	burns	
+sunburn	causes	cancer	
+sunlight	causes	warmth	
+teach	causes	learn	
+tequila	causes	drowsiness	
+terrorism	causes	death	
+terrorism	causes	sadness	

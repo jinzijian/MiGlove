@@ -143,8 +143,8 @@ def construct_graph(path, emb_path) -> object:
     emb_vectors = make_glove_embed(emb_path, idx2word)
     node_feats = get_node_feats(g, emb_vectors, word2idx, idx2word, id2node)
     edge_feats = get_edge_feats(edgelist, emb_vectors, word2idx)
-    g.ndata['infeats'] = node_feats
-    g.edata['infeats'] = edge_feats
+    g.ndata['feats'] = node_feats
+    g.edata['feats'] = edge_feats
     return g, node2id, id2node, edgelist, word2idx, idx2word, node_feats, edge_feats, emb_vectors
 
 
