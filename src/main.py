@@ -24,8 +24,8 @@ if __name__ == '__main__':
     parser.add_argument('--epoch', type=int, default=200, help="max state of GNN model")
     parser.add_argument("--gpu", type=int, default=0, help="gpu")
     parser.add_argument("--lr", type=float, default=1e-4, help="learning rate")
-    parser.add_argument("--method", type=str, default='deepwalk', help="the method to get graph embeddings")
-    parser.add_argument("--repeat", type=int, default= 2, help="repeat times")
+    parser.add_argument("--method", type=str, default='graphsage', help="the method to get graph embeddings")
+    parser.add_argument("--repeat", type=int, default= 1, help="repeat times")
     parser.add_argument("--mimethod", type=str, default='mine',help="type of edge sampler: 'uniform' or 'neighbor'")
     args = parser.parse_args()
 
@@ -144,6 +144,13 @@ if args.method == 'graphsage':
         neg_score = pred(test_neg_g, h)
         print('AUC', compute_auc(pos_score, neg_score))
     # ----------- get node emb -------------------------------- #
+    # evaluate model:
+    model.eval()
+    with torch.no_grad():
+        h = model(g, g.ndata['feats'].squeeze())
+        print(h.type())
+        print(h.size())
+    node_embedding = h
 
 if args.method == 'nmp':
     model = NMP(train_g.ndata['feats'].squeeze().shape[1], 128, train_g.edata['feats'].squeeze().shape[1])
@@ -175,9 +182,16 @@ if args.method == 'nmp':
         pos_score = pred(test_pos_g, h)
         neg_score = pred(test_neg_g, h)
         print('AUC', compute_auc(pos_score, neg_score))
+        # evaluate model:
+    model.eval()
+    with torch.no_grad():
+        h = model(train_g, train_g.ndata['feats'].squeeze(), train_g.edata['feats'].squeeze())
+        print(h.type())
+        print(h.size())
+    node_embedding = h
 
 # get bert embeddings
-bert_embedding = torch.randn(train_g.num_nodes(), 768)
+bert_embedding = torch.randn(g.num_nodes(), 768)
 
 # probe
 sen_sum = len(bert_embedding)
