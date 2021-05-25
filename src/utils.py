@@ -28,3 +28,42 @@ def make_glove_embed(glove_path, i2t, embed_dim='100'):
 
     final_embed = np.array(embed, dtype=np.float)
     return final_embed
+import itertools
+import math
+import random
+
+import numpy as np
+import pandas as pd
+from joblib import Parallel, delayed
+from tqdm import trange
+from alias import alias_sample, create_alias_table
+def partition_num(num, workers):
+    if num % workers == 0:
+        return [num//workers]*workers
+    else:
+        return [num//workers]*workers + [num % workers]
+
+def random_walks(G, num_walks=100, walk_len=10, string_nid=False):
+    paths = []
+    # add self loop
+    for nid in G.nodes(): G.add_edge(nid, nid)
+    if not string_nid:
+        for nid in G.nodes():
+            if G.degree(nid) == 0: continue
+            for i in range(num_walks):
+                tmp_path = [str(nid)]
+                for j in range(walk_len):
+                    neighbors = [str(n) for n in G.neighbors(int(tmp_path[-1]))]
+                    tmp_path.append(random.choice(neighbors))
+                paths.append(tmp_path)
+    else:
+        for nid in G.nodes():
+            if G.degree(nid) == 0: continue
+            for i in range(num_walks):
+                tmp_path = [nid]
+                for j in range(walk_len):
+                    neighbors = [n for n in G.neighbors(tmp_path[-1])]
+                    tmp_path.append(random.choice(neighbors))
+                paths.append(tmp_path)
+
+    return paths

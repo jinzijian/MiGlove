@@ -95,27 +95,160 @@ class NMP(nn.Module):
         h = self.conv2(g, h, edge_feats)
         return h
 
-def random_walks(G, num_walks=100, walk_len=10, string_nid=False):
-    paths = []
-    # add self loop
-    for nid in G.nodes(): G.add_edge(nid, nid)
-    if not string_nid:
-        for nid in G.nodes():
-            if G.degree(nid) == 0: continue
-            for i in range(num_walks):
-                tmp_path = [str(nid)]
-                for j in range(walk_len):
-                    neighbors = [str(n) for n in G.neighbors(int(tmp_path[-1]))]
-                    tmp_path.append(random.choice(neighbors))
-                paths.append(tmp_path)
-    else:
-        for nid in G.nodes():
-            if G.degree(nid) == 0: continue
-            for i in range(num_walks):
-                tmp_path = [nid]
-                for j in range(walk_len):
-                    neighbors = [n for n in G.neighbors(tmp_path[-1])]
-                    tmp_path.append(random.choice(neighbors))
-                paths.append(tmp_path)
 
-    return paths
+
+
+class binary_classifer(nn.Module):
+    def __init__(self,
+                 layers_num=5,
+                 feat_dim=0,
+                 hidden_dim=128):
+        super(binary_classifer, self).__init__()
+        self.layers_num = layers_num
+        self.linear_sh = nn.Linear(feat_dim, hidden_dim)
+        self.linear_dh = nn.Linear(feat_dim, hidden_dim)
+        self.linear_h1 = nn.Linear(2 * hidden_dim, hidden_dim)
+        self.linear_h2 = nn.Linear(hidden_dim, hidden_dim)
+        self.linear_h3 = nn.Linear(hidden_dim, hidden_dim)
+        self.linear_h4 = nn.Linear(hidden_dim, hidden_dim)
+        if layers_num == 0:  # 0
+            self.linear_ca = nn.Linear(2 * feat_dim, 1)
+        elif layers_num <= 1:  # 1
+            self.linear_ca = nn.Linear(2 * hidden_dim, 1)
+        else:  # 2, 3, 4, 5
+            self.linear_ca = nn.Linear(hidden_dim, 1)
+        nn.init.xavier_normal_(self.linear_ca.weight.data)
+
+    def forward(self, src, dst):
+        # layers_num = 0
+        h = torch.cat((src, dst), dim=1)
+        if self.layers_num == 0:
+            return torch.sigmoid(self.linear_ca(h))
+
+        # layers_num = 1
+        s = F.relu(self.linear_sh(src))
+        d = F.relu(self.linear_dh(dst))
+        h = torch.cat((s, d), dim=1)
+        if self.layers_num == 1:
+            return torch.sigmoid(self.linear_ca(h))
+
+        # layers_num = 2
+        h = F.relu(self.linear_h1(h))
+        if self.layers_num == 2:
+            return torch.sigmoid(self.linear_ca(h))
+
+        # layers_num = 3
+        h = F.relu(self.linear_h2(h))
+        if self.layers_num == 3:
+            return torch.sigmoid(self.linear_ca(h))
+
+        # layers_num = 4
+        h = F.relu(self.linear_h3(h))
+        if self.layers_num == 4:
+            return torch.sigmoid(self.linear_ca(h))
+
+        # layers_num = 5
+        h = F.relu(self.linear_h4(h))
+        if self.layers_num == 5:
+            return torch.sigmoid(self.linear_ca(h))
+
+
+'''
+class mine_model(nn.Module):
+    def __init__(self, 
+                adj_dim,
+                feat_dim,
+                hidden_dim=64):
+        super(mine_probe, self).__init__()
+        self.linear_ah = nn.Linear(adj_dim, hidden_dim)
+        self.linear_fh = nn.Linear(feat_dim, hidden_dim)
+        self.linear_hm = nn.Linear(hidden_dim*2, 1)
+        nn.init.xavier_normal_(self.linear_ah.weight.data)
+        nn.init.xavier_normal_(self.linear_fh.weight.data)
+        nn.init.xavier_normal_(self.linear_hm.weight.data)
+
+    def forward(self, a, f):
+        a = self.linear_ah(a)
+        f = self.linear_fh(f)
+        h = torch.cat((f, a), dim=1)
+
+        return F.elu(self.linear_hm(h))
+'''
+
+
+class MINE(nn.Module):
+    def __init__(self, x_dim, y_dim, hidden_size=64):
+        super(MINE, self).__init__()
+        self.T_func = nn.Sequential(nn.Linear(x_dim + y_dim, hidden_size),
+                                    nn.ReLU(),
+                                    nn.Linear(hidden_size, 1))
+
+    def forward(self, x_samples, y_samples):  # samples have shape [sample_size, dim]
+        # shuffle and concatenate
+        sample_size = y_samples.shape[0]
+        random_index = torch.randint(sample_size, (sample_size,)).long()
+
+        y_shuffle = y_samples[random_index]
+
+        T0 = self.T_func(torch.cat([x_samples, y_samples], dim=-1))
+        T1 = self.T_func(torch.cat([x_samples, y_shuffle], dim=-1))
+
+        lower_bound = T0.mean() - torch.log(T1.exp().mean())
+
+        # compute the negative loss (maximise loss == minimise -loss)
+        return lower_bound
+
+    def learning_loss(self, x_samples, y_samples):
+        return -self.forward(x_samples, y_samples)
+
+
+class NWJ(nn.Module):
+    def __init__(self, x_dim, y_dim, hidden_size):
+        super(NWJ, self).__init__()
+        self.F_func = nn.Sequential(nn.Linear(x_dim + y_dim, hidden_size),
+                                    nn.ReLU(),
+                                    nn.Linear(hidden_size, 1))
+
+    def forward(self, x_samples, y_samples):
+        # shuffle and concatenate
+        sample_size = y_samples.shape[0]
+
+        x_tile = x_samples.unsqueeze(0).repeat((sample_size, 1, 1))
+        y_tile = y_samples.unsqueeze(1).repeat((1, sample_size, 1))
+
+        guess = torch.cat([x_samples, y_samples], dim=-1)
+        T0 = self.F_func(guess)
+        guess2 = torch.cat([x_tile, y_tile], dim=-1)
+        T1 = self.F_func(guess2) - 1.  # shape [sample_size, sample_size, 1]
+
+        lower_bound = T0.mean() - (T1.logsumexp(dim=1) - np.log(sample_size)).exp().mean()
+        return lower_bound
+
+    def learning_loss(self, x_samples, y_samples):
+        return -self.forward(x_samples, y_samples)
+
+
+class InfoNCE(nn.Module):
+    def __init__(self, x_dim, y_dim, hidden_size):
+        super(InfoNCE, self).__init__()
+        self.F_func = nn.Sequential(nn.Linear(x_dim + y_dim, hidden_size),
+                                    nn.ReLU(),
+                                    nn.Linear(hidden_size, 1),
+                                    nn.Softplus())
+
+    def forward(self, x_samples, y_samples):  # samples have shape [sample_size, dim]
+        # shuffle and concatenate
+        sample_size = y_samples.shape[0]
+
+        x_tile = x_samples.unsqueeze(0).repeat((sample_size, 1, 1))
+        y_tile = y_samples.unsqueeze(1).repeat((1, sample_size, 1))
+
+        T0 = self.F_func(torch.cat([x_samples, y_samples], dim=-1))
+        T1 = self.F_func(torch.cat([x_tile, y_tile], dim=-1))  # [sample_size, sample_size, 1]
+
+        lower_bound = T0.mean() - (T1.logsumexp(dim=1).mean() - np.log(sample_size))
+        return lower_bound
+
+    def learning_loss(self, x_samples, y_samples):
+        return -self.forward(x_samples, y_samples)
+
