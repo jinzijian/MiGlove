@@ -142,8 +142,9 @@ def mi_probe(args, graph_emb, bert_emb, sen_num, task_name, mi_method="mine"):
             feat_vec = feat_vec.to(args.gpu)
             if graph_vec.shape[0] <= 1: continue
             if feat_vec.shape[0] <= 1: continue
-
-            loss = model.learning_loss(graph_vec, feat_vec)
+            feat_vec = feat_vec.unsqueeze(0)
+            graph_vec = graph_vec.unsqueeze(0)
+            loss = model.learning_loss(feat_vec, graph_vec)
             mi = -loss
             mi_train.append(mi.data.item())
 

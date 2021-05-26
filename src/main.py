@@ -26,7 +26,7 @@ if __name__ == '__main__':
     parser.add_argument("--lr", type=float, default=1e-4, help="learning rate")
     parser.add_argument("--method", type=str, default='graphsage', help="the method to get graph embeddings")
     parser.add_argument("--repeat", type=int, default= 1, help="repeat times")
-    parser.add_argument("--mimethod", type=str, default='mine',help="type of edge sampler: 'uniform' or 'neighbor'")
+    parser.add_argument("--mimethod", type=str, default='mine',help="type of mi method'")
     args = parser.parse_args()
 
 # set device
@@ -45,7 +45,7 @@ if args.mode == 'small':
 if args.mode == 'toy':
     train_path = '/p300/MiGlove/atomic2020/event_center/forgraph/toy_g_train.txt'
 if args.mode == 'sample':
-    train_path = '/p300/MiGlove/atomic2020/event_center/forgraph/sample_g.txt'
+    train_path = '/p300/MiGlove/atomic2020/event_center/forgraph/processed_dev_split_graph1.txt'
 train_g, train_node2id, train_id2node, train_edgelist, train_word2idx, train_idx2word, train_node_feats, train_edge_feats, train_emb_vectors = construct_graph(
     train_path, emb_path)
 test_g, test_node2id, test_id2node, test_edgelist, test_word2idx, test_idx2word, test_node_feats, test_edge_feats, test_emb_vectors = construct_graph(
