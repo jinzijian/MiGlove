@@ -119,7 +119,7 @@ def mi_probe(args, graph_emb, bert_emb, sen_num, task_name, mi_method="mine"):
         model = NWJ(graph_dim, bert_dim, hidden_size = 32).to(args.gpu)
     elif mi_method == 'nce':
         model = InfoNCE(graph_dim, bert_dim, hidden_size = 32).to(args.gpu)
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.milr)
 
     bad_np = [39927]
     mi_es = [-1 for _ in range(2)]

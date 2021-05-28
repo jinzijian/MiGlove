@@ -126,6 +126,9 @@ def gen_sentences(old_path, new_path):
     file.close()
     return 0
 
+
+
+
 def get_node_ids(old_path, new_path):
     with open(old_path, "r", encoding='utf-8') as f:
         old_lines = f.readlines()
@@ -138,10 +141,10 @@ def get_node_ids(old_path, new_path):
         for i in range(len(old_lines)):
             old_line = old_lines[i].split('\t')
             new_line = new_lines[i].split(' ')
-            sb = find_idx(new_line, old_line[0].split(' '))
-            se = sb + len(old_line[0].split(' '))
             tb = find_idx(new_line, old_line[2].split(' '))
             te = tb + len(old_line[2].split(' '))
+            sb = find_idx(new_line, old_line[0].split(' '))
+            se = sb + len(old_line[0].split(' '))
             src_b.append(sb)
             src_e.append(se)
             tgt_b.append(tb)

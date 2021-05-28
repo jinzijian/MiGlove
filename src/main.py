@@ -29,6 +29,7 @@ if __name__ == '__main__':
     parser.add_argument("--method", type=str, default='graphsage', help="the method to get graph embeddings")
     parser.add_argument("--repeat", type=int, default=1, help="repeat times")
     parser.add_argument("--mimethod", type=str, default='mine', help="type of mi method'")
+    parser.add_argument("--milr", type=float, default=1e-6 , help="learning rate of compute mutual information")
     args = parser.parse_args()
 
 # set device
@@ -42,8 +43,8 @@ test_path = '/p300/MiGlove/atomic2020/event_center/forgraph/processed_test_split
 dev_path = '/p300/MiGlove/atomic2020/event_center/forgraph/processed_dev_split_graph1.txt'
 emb_path = '/p300/TensorFSARNN/data/emb/glove.6B'
 # todo: Sample a small datasets to choose parameters
-if args.mode == 'small':
-    train_path = 'pass'
+if args.mode == 'train':
+    train_path = '/p300/MiGlove/atomic2020/event_center/forgraph/processed_train_split_graph1.txt'
 if args.mode == 'toy':
     train_path = '/p300/MiGlove/atomic2020/event_center/forgraph/toy_g_train.txt'
 if args.mode == 'sample':
@@ -73,6 +74,8 @@ if args.mode == 'toy':
     old_path = '/p300/MiGlove/atomic2020/event_center/forgraph/toy_g_train.txt'
 if args.mode == 'sample':
     old_path = '/p300/MiGlove/atomic2020/event_center/processed_dev_split_graph.txt'
+if args.mode == 'train':
+    old_path = '/p300/MiGlove/atomic2020/event_center/processed_train_split_graph.txt'
 new_path = '/p300/MiGlove/atomic2020/' + args.mode + 'bert_pretest.txt'
 gen_sentences(old_path, new_path)
 old_lines, new_lines, src_b, src_e, tgt_b, tgt_e = get_node_ids(old_path, new_path)
@@ -82,10 +85,15 @@ if os.path.exists(args.mode + "bert_embedding.pt"):
     bert_embs = torch.load(args.mode + "bert_embedding.pt")
 else:
     bert_embs = get_bert_embedding(new_lines, args)
-    torch.save(bert_embs, args.mode + "124bert_embedding.pt")
+    torch.save(bert_embs, args.mode + "bert_embedding.pt")
 old_lines, node2id, id2node, edge2id, edgelist = read_data(old_path)
 # 取出node embeddings
 node_emb = get_node_emb(old_lines, node2id, bert_embs, src_b, src_e, tgt_b, tgt_e)
+for i in range(len(node_emb)):
+    node_len = node_emb[i].shape
+    if (node_len != (768,)):
+        print(i)
+        print(id2node[i])
 node_emb = np.stack(node_emb, axis=0)
 bert_embedding = torch.from_numpy(node_emb)
 print('node')
@@ -113,6 +121,14 @@ if (args.method == 'graphsage' or args.method == 'nmp'):
 
     test_pos_g = dgl.graph((test_pos_u, test_pos_v), num_nodes=g.number_of_nodes())
     test_neg_g = dgl.graph((test_neg_u, test_neg_v), num_nodes=g.number_of_nodes())
+    #move to gpu
+    if use_cuda:
+        g = g.to(args.gpu)
+        train_g = train_g.to(args.gpu)
+        train_pos_g = train_pos_g.to(args.gpu)
+        train_neg_g = train_neg_g.to(args.gpu)
+        test_pos_g = test_pos_g.to(args.gpu)
+        test_neg_g = test_neg_g.to(args.gpu)
 
 if args.method == 'deepwalk':
     src, tgt = train_g.edges()
@@ -121,6 +137,7 @@ if args.method == 'deepwalk':
     for i in range(len(src)):
         local_graph.add_edge(int(src[i]), int(tgt[i]))
     local_walks = random_walks(local_graph, 100, 10)
+    local_walks = local_walks
     local_idx = []
     print(len(local_graph.nodes()))
     for node in local_graph.nodes():
@@ -133,6 +150,7 @@ if args.method == 'deepwalk':
                                sg=1,
                                hs=1,
                                workers=20)
+        local_model = local_model
         local_vec = local_model.wv[local_idx]
     else:
         local_vec = np.zeros((1, 128))
@@ -142,12 +160,15 @@ if args.method == 'deepwalk':
     print(len(local_vec))
     node_embedding = torch.Tensor(local_vec)
 
+
 if args.method == 'graphsage':
     # Define Model
     model = GraphSAGE(train_g.ndata['feats'].squeeze().shape[1], 128)
+    model = model.to(args.gpu)
     # You can replace DotPredictor with MLPPredictor.
     # pred = MLPPredictor(16)
     pred = DotPredictor()
+    pred = pred.to(args.gpu)
     optimizer = torch.optim.Adam(itertools.chain(model.parameters(), pred.parameters()), lr=args.lr)
     # ----------- training -------------------------------- #
     all_logits = []
@@ -159,7 +180,7 @@ if args.method == 'graphsage':
             h = model(train_g, train_g.ndata['feats'].squeeze(), train_g.edata['feats'].squeeze())
         pos_score = pred(train_pos_g, h)
         neg_score = pred(train_neg_g, h)
-        loss = compute_loss(pos_score, neg_score)
+        loss = compute_loss(args, pos_score, neg_score, use_cuda)
 
         # backward
         optimizer.zero_grad()
@@ -173,7 +194,7 @@ if args.method == 'graphsage':
         pos_score = pred(test_pos_g, h)
         neg_score = pred(test_neg_g, h)
         print('AUC', compute_auc(pos_score, neg_score))
-    # ----------- get node emb -------------------------------- #
+    # ----------- get node emb --------------------------------
     # evaluate model:
     model.eval()
     with torch.no_grad():
@@ -185,6 +206,8 @@ if args.method == 'graphsage':
 if args.method == 'nmp':
     model = NMP(train_g.ndata['feats'].squeeze().shape[1], 128, train_g.edata['feats'].squeeze().shape[1])
     pred = DotPredictor()
+    model = model.to(args.gpu)
+    pred = pred.to(args.gpu)
     optimizer = torch.optim.Adam(itertools.chain(model.parameters(), pred.parameters()), lr=args.lr)
 
     # ----------- training -------------------------------- #
@@ -197,7 +220,7 @@ if args.method == 'nmp':
             h = model(train_g, train_g.ndata['feats'].squeeze(), train_g.edata['feats'].squeeze())
         pos_score = pred(train_pos_g, h)
         neg_score = pred(train_neg_g, h)
-        loss = compute_loss(pos_score, neg_score)
+        loss = compute_loss(args, pos_score, neg_score, use_cuda)
 
         # backward
         optimizer.zero_grad()

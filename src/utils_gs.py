@@ -16,12 +16,17 @@ import tqdm
 import networkx as nx
 import dgl.function as fn
 from sklearn.metrics import roc_auc_score
-def compute_loss(pos_score, neg_score):
+def compute_loss(args, pos_score, neg_score, use_cuda):
     scores = torch.cat([pos_score, neg_score])
     labels = torch.cat([torch.ones(pos_score.shape[0]), torch.zeros(neg_score.shape[0])])
-    return F.binary_cross_entropy_with_logits(scores, labels)
+    if use_cuda:
+        labels = labels.to(args.gpu)
+    loss = F.binary_cross_entropy_with_logits(scores, labels)
+    return loss
 
 def compute_auc(pos_score, neg_score):
+    pos_score = pos_score.cpu()
+    neg_score = neg_score.cpu()
     scores = torch.cat([pos_score, neg_score]).numpy()
     labels = torch.cat(
         [torch.ones(pos_score.shape[0]), torch.zeros(neg_score.shape[0])]).numpy()
