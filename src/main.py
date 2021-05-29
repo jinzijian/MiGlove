@@ -81,11 +81,11 @@ gen_sentences(old_path, new_path)
 old_lines, new_lines, src_b, src_e, tgt_b, tgt_e = get_node_ids(old_path, new_path)
 
 # 得到bert embbeddings
-if os.path.exists(args.mode + "bert_embedding.pt"):
-    bert_embs = torch.load(args.mode + "bert_embedding.pt")
+if os.path.exists(args.mode + "12345new_bert_embedding.pt"):
+    bert_embs = torch.load(args.mode + "new_bert_embedding.pt")
 else:
     bert_embs = get_bert_embedding(new_lines, args)
-    torch.save(bert_embs, args.mode + "bert_embedding.pt")
+    torch.save(bert_embs, args.mode + "new_bert_embedding.pt")
 old_lines, node2id, id2node, edge2id, edgelist = read_data(old_path)
 # 取出node embeddings
 node_emb = get_node_emb(old_lines, node2id, bert_embs, src_b, src_e, tgt_b, tgt_e)
@@ -94,6 +94,7 @@ for i in range(len(node_emb)):
     if (node_len != (768,)):
         print(i)
         print(id2node[i])
+        print(node_len)
 node_emb = np.stack(node_emb, axis=0)
 bert_embedding = torch.from_numpy(node_emb)
 print('node')

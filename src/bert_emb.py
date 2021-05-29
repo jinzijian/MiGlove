@@ -25,7 +25,7 @@ def get_bert_embedding(lines, args):
     i = 0
     for line in tqdm(lines):
         i = i + 1
-        input_text = line
+        input_text = line.lstrip()
         # 通过tokenizer把文本变成 token_id
         mask = []
         input_ids = tokenizer.encode(input_text, add_special_tokens=False)
@@ -48,6 +48,6 @@ def get_bert_embedding(lines, args):
             states = []
             for i in range(len(mask)):
                 states.append(last_hidden_states[mask[i]])
-        bert_embedding.append(states)
+            bert_embedding.append(states)
     return bert_embedding
 

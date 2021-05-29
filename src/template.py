@@ -76,13 +76,13 @@ def deal_sentence(line):
         return sentence
 
     if 'is filled by' in line[1]:
-        # p = line.index('reason')
-        line_tmp = line[0].split(' ')
-        p = line_tmp.index('kkk')
-        line_tmp[p] = line[-2]
+        # # p = line.index('reason')
+        # line_tmp = line[0].split(' ')
+        # p = line_tmp.index('kkk')
+        # line_tmp[p] = line[-2]
         # print(line_tmp)
         sentence = ''
-        for word in line_tmp:
+        for word in line[:-1]:
             if (word == '\n'):
                 continue
             sentence += word
@@ -140,11 +140,12 @@ def get_node_ids(old_path, new_path):
         tgt_e = []
         for i in range(len(old_lines)):
             old_line = old_lines[i].split('\t')
+            new_lines[i] = new_lines[i].lstrip()
             new_line = new_lines[i].split(' ')
-            tb = find_idx(new_line, old_line[2].split(' '))
-            te = tb + len(old_line[2].split(' '))
             sb = find_idx(new_line, old_line[0].split(' '))
             se = sb + len(old_line[0].split(' '))
+            tb = find_idx(new_line, old_line[2].split(' '))
+            te = tb + len(old_line[2].split(' '))
             src_b.append(sb)
             src_e.append(se)
             tgt_b.append(tb)
@@ -200,111 +201,17 @@ if __name__ == '__main__':
     parser.add_argument("--mimethod", type=str, default='mine', help="type of mi method'")
     args = parser.parse_args()
 
-    with open('/p300/MiGlove/atomic2020/event_center/processed_dev_split_graph.txt', "r", encoding='utf-8') as f:
+
+    if args.mode == 'toy':
+        old_path = '/p300/MiGlove/atomic2020/event_center/forgraph/toy_g_train.txt'
+    if args.mode == 'sample':
+        old_path = '/p300/MiGlove/atomic2020/event_center/processed_dev_split_graph.txt'
+    if args.mode == 'train':
+        old_path = '/p300/MiGlove/atomic2020/event_center/processed_train_split_graph.txt'
+    new_path = '/p300/MiGlove/atomic2020/' + args.mode + 'bert_pretest.txt'
+    with open(old_path, "r", encoding='utf-8') as f:
         lines = f.readlines()
-    sentences = []
-    print(len(lines))
-    for line in lines:
-        line = line.split('\t')
-        sentence = deal_sentence(line)
-        sentences.append(sentence)
-    print(len(sentences))
-    file = open('/p300/MiGlove/atomic2020/event_center/bert_pretest.txt', 'w', encoding='utf-8')
-    for sentence in sentences:
-        if (sentence.count('\n') == 2):
-            print(sentence)
-        file.write(sentence)
-    file.close()
-
-    with open('/p300/MiGlove/atomic2020/event_center/processed_dev_split_graph.txt', "r", encoding='utf-8') as f:
-        old_lines = f.readlines()
-    with open('/p300/MiGlove/atomic2020/event_center/bert_pretest.txt', 'r', encoding='utf-8') as f:
-        new_lines = f.readlines()
-    print(len(old_lines))
-    print(len(new_lines))
-    print(old_lines[17313])
-    print(new_lines[17313])
-    old_line = old_lines[17313].split('\t')
-    new_line = new_lines[17313].split(' ')
-    # 存储位置
-    src = old_line[0].split(' ')
-    tgt = old_line[1].split(' ')
-    src_b = []
-    src_e = []
-    tgt_b = []
-    tgt_e = []
-    for i in range(len(old_lines)):
-        old_line = old_lines[i].split('\t')
-        new_line = new_lines[i].split(' ')
-        sb = find_idx(new_line, old_line[0].split(' '))
-        se = sb + len(old_line[0].split(' '))
-        tb = find_idx(new_line, old_line[2].split(' '))
-        te = tb + len(old_line[2].split(' '))
-        src_b.append(sb)
-        src_e.append(se)
-        tgt_b.append(tb)
-        tgt_e.append(te)
-
-    # 得到bert embbeddings
-    if os.path.exists(args.mode + "124bert_embedding.pt"):
-        bert_embs = torch.load(args.mode + "124bert_embedding.pt")
-    else:
-        bert_embs = get_bert_embedding(new_lines, args)
-
-        torch.save(bert_embs, args.mode + "124bert_embedding.pt")
-    # print(len(bert_emb))
-    # for i in range(10):
-    #     print(len(bert_emb[i]))
-
-    # 取出node embeddings
-    old_lines, node2id, id2node, edge2id, edgelist = read_data('/p300/MiGlove/atomic2020/event_center/processed_dev_split_graph.txt')
-    node_emb = [[] for i in range(len(node2id))]
-    print(len(node2id))
-    print(len(node_emb))
-    for i in range(len(old_lines)):
-        line = old_lines[i]
-        line = line.split('\t')
-        bert_emb = bert_embs[i]
-        src_emb = bert_emb[src_b[i]:src_e[i]]
-        tgt_emb = bert_emb[tgt_b[i]: tgt_e[i]]
-        src = line[0]
-        rel = line[1]
-        tgt = line[2]
-        src_id = node2id[src]
-        tgt_id = node2id[tgt]
-        node_emb[src_id].append(src_emb)
-        node_emb[tgt_id].append(tgt_emb)
-    print('ready')
-    print(len(node_emb))
-
-
-    node_emb = np.array(node_emb)
-    for i in range(len(node_emb)):
-        for j in range(len(node_emb[i])):
-            for k in range(len(node_emb[i][j])):
-                node_emb[i][j][k] = node_emb[i][j][k].cpu()
-                node_emb[i][j][k] = node_emb[i][j][k].numpy()
-    for i in range(len(node_emb)):
-        node_emb[i] = np.array(node_emb[i])
-        for j in range(len(node_emb[i])):
-            node_emb[i][j] = np.array(node_emb[i][j])
-    print('convert ready')
-    n7 = node_emb[7]
-    print(len(n7))
-    print(len(n7[0]))
-    print(len(n7[0][0]))
-    for i in range(len(node_emb)):
-        node_emb[i] = np.mean(node_emb[i], axis=0)
-    n7 = node_emb[7]
-    print(len(n7))
-    print(len(n7[0]))
-
-    for i in range(len(node_emb)):
-        node_emb[i] = np.mean(node_emb[i], axis=0)
-    n7 = node_emb[7]
-    print(len(node_emb))
-    print(len(n7))
-
+    print('bug')
 
 
 
