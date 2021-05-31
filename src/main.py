@@ -22,6 +22,7 @@ from template import *
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--task', type=str, default='probe', help="probe or just eval graph embeddings")
     parser.add_argument('--mode', type=str, default='toy', help="use which dataset to train")
     parser.add_argument('--epoch', type=int, default=200, help="max state of GNN model")
     parser.add_argument("--gpu", type=int, default=0, help="gpu")
@@ -68,40 +69,7 @@ train_size = g.number_of_edges() - test_size
 test_pos_u, test_pos_v = u[eids[:test_size]], v[eids[:test_size]]
 train_pos_u, train_pos_v = u[eids[test_size:]], v[eids[test_size:]]
 
-# get bert embeddings
-bert_embedding = torch.randn(g.num_nodes(), 768)
-if args.mode == 'toy':
-    old_path = '/p300/MiGlove/atomic2020/event_center/forgraph/toy_g_train.txt'
-if args.mode == 'sample':
-    old_path = '/p300/MiGlove/atomic2020/event_center/processed_dev_split_graph.txt'
-if args.mode == 'train':
-    old_path = '/p300/MiGlove/atomic2020/event_center/processed_train_split_graph.txt'
-new_path = '/p300/MiGlove/atomic2020/' + args.mode + 'bert_pretest.txt'
-gen_sentences(old_path, new_path)
-old_lines, new_lines, src_b, src_e, tgt_b, tgt_e = get_node_ids(old_path, new_path)
 
-# 得到bert embbeddings
-if os.path.exists(args.mode + "12345new_bert_embedding.pt"):
-    bert_embs = torch.load(args.mode + "new_bert_embedding.pt")
-else:
-    bert_embs = get_bert_embedding(new_lines, args)
-    torch.save(bert_embs, args.mode + "new_bert_embedding.pt")
-old_lines, node2id, id2node, edge2id, edgelist = read_data(old_path)
-# 取出node embeddings
-node_emb = get_node_emb(old_lines, node2id, bert_embs, src_b, src_e, tgt_b, tgt_e)
-for i in range(len(node_emb)):
-    node_len = node_emb[i].shape
-    if (node_len != (768,)):
-        print(i)
-        print(id2node[i])
-        print(node_len)
-node_emb = np.stack(node_emb, axis=0)
-bert_embedding = torch.from_numpy(node_emb)
-print('node')
-# for i in range(len(node_emb)):
-#     for j in range(768):
-#         bert_embedding[i][j] = node_emb[i][j]
-# print('convert')
 
 # get graph emb
 if (args.method == 'graphsage' or args.method == 'nmp'):
@@ -244,41 +212,78 @@ if args.method == 'nmp':
         print(h.size())
     node_embedding = h
 
-# probe
-sen_sum = len(bert_embedding)
-bert_layers_num = 12
-mir, mig, mib = [], [], []
-for l in range(bert_layers_num): mib.append([])
-for r in range(args.repeat):
-    tmp_mir = probe.mi_probe(args, node_embedding, bert_embedding, sen_sum, 'lower')
-    tmp_mig = probe.mi_probe(args, node_embedding, bert_embedding, sen_sum, 'upper')
-    # get sum value
-    if len(mir) == 0:
-        mir = tmp_mir
-    else:
-        mir = [mir[s] + tmp_mir[s] for s in range(len(tmp_mir))]
-    if len(mig) == 0:
-        mig = tmp_mig
-    else:
-        mig = [mig[s] + tmp_mig[s] for s in range(len(tmp_mig))]
-for l in range(bert_layers_num):
-    # bert_emb = np.load(bert_emb_paths[l], allow_pickle=True)
-    for r in range(args.repeat):
-        tmp_mib = probe.mi_probe(args, node_embedding, bert_embedding, sen_sum, l)
-        if len(mib[l]) == 0:
-            mib[l] = tmp_mib
-        else:
-            mib[l] = [mib[l][s] + tmp_mib[s] for s in range(len(tmp_mib))]
 
-# compute average values for all results
-mir = [mi / args.repeat for mi in mir]
-mig = [mi / args.repeat for mi in mig]
-for l in range(bert_layers_num):
-    mib[l] = [mi / args.repeat for mi in mib[l]]
-# torch.save(mi_eval, 'result.pt ')
-mib_layers = [sum(mib[l]) / len(mib[l]) for l in range(len(mib)) if len(mib)]
-mir, mig, mib_layers = sum(mir) / len(mir), sum(mig) / len(mig), mib_layers
-print('MI(G, R): {} | MI(G, G): {}| MI(G, BERT): {} |'.format(mir, mig, mib_layers))
-#
-# mi_eval = probe.mi_probe(args, node_embedding, bert_embedding, sen_sum, 'upper')
-# print(mi_eval)
+if args.task == 'probe':
+    # get bert embeddings
+    bert_embedding = torch.randn(g.num_nodes(), 768)
+    if args.mode == 'toy':
+        old_path = '/p300/MiGlove/atomic2020/event_center/forgraph/toy_g_train.txt'
+    if args.mode == 'sample':
+        old_path = '/p300/MiGlove/atomic2020/event_center/processed_dev_split_graph.txt'
+    if args.mode == 'train':
+        old_path = '/p300/MiGlove/atomic2020/event_center/processed_train_split_graph.txt'
+    new_path = '/p300/MiGlove/atomic2020/' + args.mode + 'bert_pretest.txt'
+    gen_sentences(old_path, new_path)
+    old_lines, new_lines, src_b, src_e, tgt_b, tgt_e = get_node_ids(old_path, new_path)
+
+    # 得到bert embbeddings
+    if os.path.exists(args.mode + "12345new_bert_embedding.pt"):
+        bert_embs = torch.load(args.mode + "new_bert_embedding.pt")
+    else:
+        bert_embs = get_bert_embedding(new_lines, args)
+        torch.save(bert_embs, args.mode + "new_bert_embedding.pt")
+    old_lines, node2id, id2node, edge2id, edgelist = read_data(old_path)
+    # 取出node embeddings
+    node_emb = get_node_emb(old_lines, node2id, bert_embs, src_b, src_e, tgt_b, tgt_e)
+    for i in range(len(node_emb)):
+        node_len = node_emb[i].shape
+        if (node_len != (768,)):
+            print(i)
+            print(id2node[i])
+            print(node_len)
+    node_emb = np.stack(node_emb, axis=0)
+    bert_embedding = torch.from_numpy(node_emb)
+    print('node')
+    # for i in range(len(node_emb)):
+    #     for j in range(768):
+    #         bert_embedding[i][j] = node_emb[i][j]
+    # print('convert')
+
+    #probe
+    sen_sum = len(bert_embedding)
+    bert_layers_num = 12
+    mir, mig, mib = [], [], []
+    for l in range(bert_layers_num): mib.append([])
+    for r in range(args.repeat):
+        tmp_mir = probe.mi_probe(args, node_embedding, bert_embedding, sen_sum, 'lower')
+        tmp_mig = probe.mi_probe(args, node_embedding, bert_embedding, sen_sum, 'upper')
+        # get sum value
+        if len(mir) == 0:
+            mir = tmp_mir
+        else:
+            mir = [mir[s] + tmp_mir[s] for s in range(len(tmp_mir))]
+        if len(mig) == 0:
+            mig = tmp_mig
+        else:
+            mig = [mig[s] + tmp_mig[s] for s in range(len(tmp_mig))]
+    for l in range(bert_layers_num):
+        # bert_emb = np.load(bert_emb_paths[l], allow_pickle=True)
+        for r in range(args.repeat):
+            tmp_mib = probe.mi_probe(args, node_embedding, bert_embedding, sen_sum, l)
+            if len(mib[l]) == 0:
+                mib[l] = tmp_mib
+            else:
+                mib[l] = [mib[l][s] + tmp_mib[s] for s in range(len(tmp_mib))]
+
+    # compute average values for all results
+    mir = [mi / args.repeat for mi in mir]
+    mig = [mi / args.repeat for mi in mig]
+    for l in range(bert_layers_num):
+        mib[l] = [mi / args.repeat for mi in mib[l]]
+    # torch.save(mi_eval, 'result.pt ')
+    mib_layers = [sum(mib[l]) / len(mib[l]) for l in range(len(mib)) if len(mib)]
+    mir, mig, mib_layers = sum(mir) / len(mir), sum(mig) / len(mig), mib_layers
+    print('MI(G, R): {} | MI(G, G): {}| MI(G, BERT): {} |'.format(mir, mig, mib_layers))
+    #
+    # mi_eval = probe.mi_probe(args, node_embedding, bert_embedding, sen_sum, 'upper')
+    # print(mi_eval)
