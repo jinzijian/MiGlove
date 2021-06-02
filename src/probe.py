@@ -114,11 +114,11 @@ def mi_probe(args, graph_emb, bert_emb, sen_num, task_name, mi_method="mine"):
         bert_dim = graph_dim
 
     if mi_method == 'mine':
-        model = MINE(graph_dim, bert_dim).to(args.gpu)
+        model = MINE(args, graph_dim, bert_dim).to(args.gpu)
     elif mi_method == 'nwj':
-        model = NWJ(graph_dim, bert_dim, hidden_size = 32).to(args.gpu)
+        model = NWJ(args, graph_dim, bert_dim, hidden_size = args.hidden_size).to(args.gpu)
     elif mi_method == 'nce':
-        model = InfoNCE(graph_dim, bert_dim, hidden_size = 32).to(args.gpu)
+        model = InfoNCE(args, graph_dim, bert_dim, hidden_size = args.hidden_size).to(args.gpu)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.milr)
 
     bad_np = [39927]

@@ -177,10 +177,18 @@ class mine_model(nn.Module):
 
 
 class MINE(nn.Module):
-    def __init__(self, x_dim, y_dim, hidden_size=64):
+    def __init__(self, args, x_dim, y_dim, hidden_size):
         super(MINE, self).__init__()
+        if args.nonlinear == 'relu':
+            nonlinear = nn.ReLU()
+        if args.nonlinear == 'sigmoid':
+            nonlinear = nn.Sigmoid()
+        if args.nonlinear == 'elu':
+            nonlinear = nn.ELU()
+        if args.nonlinear == 'tanh':
+            nonlinear = nn.Tanh()
         self.T_func = nn.Sequential(nn.Linear(x_dim + y_dim, hidden_size),
-                                    nn.ReLU(),
+                                    nonlinear,
                                     nn.Linear(hidden_size, 1))
 
     def forward(self, x_samples, y_samples):  # samples have shape [sample_size, dim]
@@ -203,10 +211,18 @@ class MINE(nn.Module):
 
 
 class NWJ(nn.Module):
-    def __init__(self, x_dim, y_dim, hidden_size):
+    def __init__(self, args, x_dim, y_dim, hidden_size):
         super(NWJ, self).__init__()
+        if args.nonlinear == 'relu':
+            nonlinear = nn.ReLU()
+        if args.nonlinear == 'sigmoid':
+            nonlinear = nn.Sigmoid()
+        if args.nonlinear == 'elu':
+            nonlinear = nn.ELU()
+        if args.nonlinear == 'tanh':
+            nonlinear = nn.Tanh()
         self.F_func = nn.Sequential(nn.Linear(x_dim + y_dim, hidden_size),
-                                    nn.ReLU(),
+                                    nonlinear,
                                     nn.Linear(hidden_size, 1))
 
     def forward(self, x_samples, y_samples):
@@ -229,10 +245,18 @@ class NWJ(nn.Module):
 
 
 class InfoNCE(nn.Module):
-    def __init__(self, x_dim, y_dim, hidden_size):
+    def __init__(self, args, x_dim, y_dim, hidden_size):
         super(InfoNCE, self).__init__()
+        if args.nonlinear == 'relu':
+            nonlinear = nn.ReLU()
+        if args.nonlinear == 'sigmoid':
+            nonlinear = nn.Sigmoid()
+        if args.nonlinear == 'elu':
+            nonlinear = nn.ELU()
+        if args.nonlinear == 'tanh':
+            nonlinear = nn.Tanh()
         self.F_func = nn.Sequential(nn.Linear(x_dim + y_dim, hidden_size),
-                                    nn.ReLU(),
+                                    nonlinear,
                                     nn.Linear(hidden_size, 1),
                                     nn.Softplus())
 

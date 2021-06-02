@@ -31,6 +31,8 @@ if __name__ == '__main__':
     parser.add_argument("--repeat", type=int, default=1, help="repeat times")
     parser.add_argument("--mimethod", type=str, default='mine', help="type of mi method'")
     parser.add_argument("--milr", type=float, default=1e-6 , help="learning rate of compute mutual information")
+    parser.add_argument("--hidden_size", type=int, default=64, help="probe hidden size")
+    parser.add_argument("--nonlinear", type=str, default='sigmoid', help="nonlinear")
     args = parser.parse_args()
 
 # set device
