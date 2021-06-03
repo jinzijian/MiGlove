@@ -5,11 +5,12 @@ import torch
 import networkx as nx
 import numpy as np
 from tqdm import tqdm
+from torch.utils.data import DataLoader
+
 from models import MINE, NWJ, InfoNCE
 #from embed import graph_embeddings, bert_embeddings, get_embeddings
 #from utils2 import load_data, construct_graph, load_glove, load_elmo, load_elmos
 
-from tqdm import tqdm
 '''
 def mine_probe(args, graph_emb, bert_emb, sen_num, task_name, noisy_id=[]):
     bert_dim = bert_emb['s0'].shape[1]
@@ -112,32 +113,36 @@ def mi_probe(args, graph_emb, bert_emb, sen_num, task_name, mi_method="mine"):
     graph_dim = graph_emb.shape[1]
     if task_name == 'upper':
         bert_dim = graph_dim
-
+    print(graph_emb.shape, bert_emb.shape)
     if mi_method == 'mine':
-        model = MINE(graph_dim, bert_dim).to(args.gpu)
+        model = MINE(graph_dim, bert_dim, hidden_size = 64).to(args.gpu)
     elif mi_method == 'nwj':
         model = NWJ(graph_dim, bert_dim, hidden_size = 32).to(args.gpu)
     elif mi_method == 'nce':
         model = InfoNCE(graph_dim, bert_dim, hidden_size = 32).to(args.gpu)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.milr)
+    batch_size = 4096
+    loader_graph = DataLoader(graph_emb, batch_size=batch_size)
+    loader_bert = DataLoader(bert_emb, batch_size=batch_size)
 
-    bad_np = [39927]
+    bad_np = []
     mi_es = [-1 for _ in range(2)]
     model.train()
     for epoch in range(10):  # epoch
         mi_train = []
         print('MI epoch is' + str(epoch))
-        for i in tqdm(range(sen_num)):  # batch
-            if i in bad_np: continue
-            graph_vec = graph_emb[i]
+        # for i in tqdm(range(sen_num)):  # batch
+        for graph_vec, feat_vec in zip(loader_graph, loader_bert):
+            # if i in bad_np: continue
             if task_name == 'lower':
-                feat_vec = torch.randn(size=bert_emb[i].shape)
+                feat_vec = torch.randn(feat_vec.shape)
             elif task_name == 'upper':
                 feat_vec = graph_vec
             elif type(task_name) == int:
-                feat_vec = bert_emb[i]
+                feat_vec = feat_vec
             else:
                 print('Error probe task name: ', task_name)
+
             graph_vec = graph_vec.to(args.gpu)
             feat_vec = feat_vec.to(args.gpu)
             if graph_vec.shape[0] <= 1: continue
@@ -160,14 +165,14 @@ def mi_probe(args, graph_emb, bert_emb, sen_num, task_name, mi_method="mine"):
 
     mi_eval = []
     model.eval()
-    for i in tqdm(range(sen_num)):  # batch
-        graph_vec = graph_emb[i]
+    # for i in tqdm(range(sen_num)):  # batch
+    for graph_vec, feat_vec in zip(loader_graph, loader_bert):
         if task_name == 'lower':
-            feat_vec = torch.randn(size=bert_emb[i].shape)
+            feat_vec = torch.randn(size=feat_vec.shape)
         elif task_name == 'upper':
             feat_vec = graph_vec
         elif type(task_name) == int:
-            feat_vec = bert_emb[i]
+            feat_vec = feat_vec
         else:
             print('Error probe task name: ', task_name)
         graph_vec = graph_vec.to(args.gpu)
