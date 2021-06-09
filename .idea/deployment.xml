@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+<<<<<<< Updated upstream
   <component name="PublishConfigData" autoUpload="Always" serverName="node17" remoteFilesAllowedToDisappearOnAutoupload="false" autoUploadExternalChanges="true">
+=======
+  <component name="PublishConfigData" autoUpload="Always" serverName="root@10.15.89.41:28979" remoteFilesAllowedToDisappearOnAutoupload="false" autoUploadExternalChanges="true">
+>>>>>>> Stashed changes
     <serverData>
       <paths name="node17">
         <serverdata>
@@ -13,6 +17,13 @@
         <serverdata>
           <mappings>
             <mapping deploy="/p300/MiGlove" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="root@10.15.89.41:28979">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/p300/MiGlove" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>

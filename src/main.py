@@ -24,6 +24,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--batch_size', type=int, default=200, help="mi batch_size")
     parser.add_argument('--task', type=str, default='probe', help="probe or just eval graph embeddings")
+    parser.add_argument('--batch_size', type=int, default=100, help="number of each batch")
     parser.add_argument('--mode', type=str, default='toy', help="use which dataset to train")
     parser.add_argument('--epoch', type=int, default=200, help="max state of GNN model")
     parser.add_argument("--gpu", type=int, default=0, help="gpu")
@@ -230,11 +231,11 @@ if args.task == 'probe':
     old_lines, new_lines, src_b, src_e, tgt_b, tgt_e = get_node_ids(old_path, new_path)
 
     # 得到bert embbeddings
-    if os.path.exists(args.mode + "12345new_bert_embedding.pt"):
-        bert_embs = torch.load(args.mode + "new_bert_embedding.pt")
+    if os.path.exists(args.mode + "0601new_bert_embedding.pt"):
+        bert_embs = torch.load(args.mode + "0601new_bert_embedding.pt")
     else:
         bert_embs = get_bert_embedding(new_lines, args)
-        torch.save(bert_embs, args.mode + "new_bert_embedding.pt")
+        torch.save(bert_embs, args.mode + "0601 new_bert_embedding.pt")
     old_lines, node2id, id2node, edge2id, edgelist = read_data(old_path)
     # 取出node embeddings
     node_emb = get_node_emb(old_lines, node2id, bert_embs, src_b, src_e, tgt_b, tgt_e)
