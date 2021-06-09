@@ -185,7 +185,17 @@ def get_node_emb(old_lines, node2id, bert_embs, src_b, src_e, tgt_b, tgt_e):
         node_emb[i] = np.mean(node_emb[i], axis=0)
     return node_emb
 
-
+def convertBert(old_lines, node2id, bert_embs, src_b, src_e, tgt_b, tgt_e):
+    node_emb = get_node_emb(old_lines, node2id, bert_embs, src_b, src_e, tgt_b, tgt_e)
+    for i in range(len(node_emb)):
+        node_len = node_emb[i].shape
+        if (node_len != (768,)):
+            print(i)
+            print(id2node[i])
+            print(node_len)
+    node_emb = np.stack(node_emb, axis=0)
+    bert_embedding = torch.from_numpy(node_emb)
+    return bert_embedding
 
 
 import argparse

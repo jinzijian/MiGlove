@@ -9,6 +9,7 @@ import torch
 from transformers import BertModel, BertTokenizer
 
 
+
 def get_bert_embedding(lines, args):
     # 这里我们调用bert-base模型，同时模型的词典经过小写处理
     model_name = 'bert-base-uncased'
@@ -18,10 +19,16 @@ def get_bert_embedding(lines, args):
     # 载入模型
     model = BertModel.from_pretrained(prepath)
     use_cuda = args.gpu >= 0 and torch.cuda.is_available()
+    if model_name == 'bert-base-uncased':
+        layers_num = 13
     if use_cuda:
         model.to(args.gpu)
     # 输入文本
-    bert_embedding = []
+    all_layers = []
+    for i in range(layers_num):
+        bert_embedding = []
+        all_layers.append(bert_embedding)
+
     i = 0
     for line in tqdm(lines):
         i = i + 1
@@ -41,13 +48,17 @@ def get_bert_embedding(lines, args):
             input_ids = input_ids.to(args.gpu)
         # 获得BERT模型最后一个隐层结果
         with torch.no_grad():
-            last_hidden_states = model(input_ids)[0]
-            last_hidden_states = last_hidden_states.squeeze(0)
+            all_hideen_states = model(input_ids)[2]
+            # last_hidden_states = model(input_ids)[0]
+            # last_hidden_states = last_hidden_states.squeeze(0)
             #last_hidden_states = torch.mean(last_hidden_states, dim=0)
         # print(last_hidden_states.shape)
-            states = []
-            for i in range(len(mask)):
-                states.append(last_hidden_states[mask[i]])
-            bert_embedding.append(states)
-    return bert_embedding
+            for i in range(len(all_hideen_states)):
+                hidden_state = all_hideen_states[i]
+                hidden_state = hidden_state.squeeze(0)
+                states = []
+                for j in range(len(mask)):
+                    states.append(hidden_state[mask[j]])
+                all_layers[i].append(states)
+    return all_layers
 

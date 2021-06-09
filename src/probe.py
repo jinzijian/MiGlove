@@ -113,7 +113,7 @@ def mi_probe(args, graph_emb, bert_emb, sen_num, task_name, mi_method="mine"):
     graph_dim = graph_emb.shape[1]
     if task_name == 'upper':
         bert_dim = graph_dim
-    print(graph_emb.shape, bert_emb.shape)
+    print(graph_emb.shape, bert_emb[0].shape)
     if mi_method == 'mine':
         model = MINE(args, graph_dim, bert_dim, hidden_size = args.hidden_size).to(args.gpu)
     elif mi_method == 'nwj':
@@ -206,3 +206,74 @@ def mi_probe(args, graph_emb, bert_emb, sen_num, task_name, mi_method="mine"):
     gc.collect()
 
     return mi_eval
+
+
+def probe_func_probe(args, graph_emb, bert_emb, uncontext=False):
+    if args.pretrained_models == 'bert-base-uncased':
+        bert_layers_num = 13
+    else:
+        bert_layers_num = 25
+
+    # initialize mi
+    mir, mig, mib = [], [], []
+    for l in range(bert_layers_num): mib.append([])
+    s_num = len(graph_emb)
+
+    if args.baselines:
+        print('3.1 start to calculate baselines of MI...')
+        # calculate MI baselines
+        for r in range(args.repeat):
+            tmp_mir = mi_probe(args, graph_emb, bert_emb[0], s_num, 'lower')
+            tmp_mig = mi_probe(args, graph_emb, bert_emb[0], s_num, 'upper')
+            # get sum value
+            if len(mir) == 0:
+                mir = tmp_mir
+            else:
+                mir = [mir[s] + tmp_mir[s] for s in range(len(tmp_mir))]
+            if len(mig) == 0:
+                mig = tmp_mig
+            else:
+                mig = [mig[s] + tmp_mig[s] for s in range(len(tmp_mig))]
+
+    print('2.2 start to calculate BERT hidden states of MI...')
+    # calculate MI of BERT
+
+    if uncontext:
+        for r in range(args.repeat):
+            tmp_mib = mi_probe(args, graph_emb, bert_emb, s_num, bert_layers_num - 1)
+            if len(mib[-1]) == 0:
+                mib[-1] = tmp_mib
+            else:
+                mib[-1] = [mib[-1][s] + tmp_mib[s] for s in range(len(tmp_mib))]
+        mib_layers = sum(mib[-1]) / (len(mib[-1]) * args.repeat)
+        print('MI(G, Glove): {} |'.format(mib_layers))
+    else:
+        for l in range(bert_layers_num):
+            print(l)
+            # bert_emb = np.load(bert_emb_paths[l], allow_pickle=True)
+            for r in range(args.repeat):
+                tmp_mib = mi_probe(args, graph_emb, bert_emb[l], s_num, l)
+                if len(mib[l]) == 0:
+                    mib[l] = tmp_mib
+                else:
+                    mib[l] = [mib[l][s] + tmp_mib[s] for s in range(len(tmp_mib))]
+
+        # compute average values for all results
+        mir = [mi / args.repeat for mi in mir]
+        mig = [mi / args.repeat for mi in mig]
+        for l in range(bert_layers_num):
+            print(l)
+            mib[l] = [mi / args.repeat for mi in mib[l]]
+
+        # print general results
+        # results = {'lower:': mir, 'upper': mig, 'bert': mib}
+        # print('\n', results, '\n')
+        mib_layers = [sum(mib[l]) / len(mib[l]) for l in range(len(mib)) if len(mib)]
+    return sum(mir) / len(mir), sum(mig) / len(mig), mib_layers
+
+def probe_plain(args, graph_emb, bert_emb):
+    # probe
+    mir, mig, mib_layers = probe_func_probe(args, graph_emb, bert_emb)
+    print('MI(G, R): {} | MI(G, G): {}| MI(G, BERT): {} |'.format(mir, mig, mib_layers))
+
+    return
