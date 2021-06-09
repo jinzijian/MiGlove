@@ -3,6 +3,13 @@
   <component name="RemoteMappingsManager">
     <list>
       <list>
+        <remote-mappings server-id="python@sftp://root@10.15.89.41:28979/root/anaconda3/envs/new_env/bin/python3.6">
+          <settings>
+            <list>
+              <mapping local-root="$PROJECT_DIR$/../dual-learning-RE" remote-root="/p300/MiGlove" />
+            </list>
+          </settings>
+        </remote-mappings>
         <remote-mappings server-id="python@sftp://root@10.15.89.41:28963/root/anaconda3/envs/new_env/bin/python3.6">
           <settings>
             <list>

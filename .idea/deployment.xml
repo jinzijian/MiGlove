@@ -1,22 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="10" remoteFilesAllowedToDisappearOnAutoupload="false" autoUploadExternalChanges="true">
+  <component name="PublishConfigData" autoUpload="Always" serverName="node17" remoteFilesAllowedToDisappearOnAutoupload="false" autoUploadExternalChanges="true">
     <serverData>
-      <paths name="10">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/p300/MiGlove" local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="root@10.15.89.41:28795">
+      <paths name="node17">
         <serverdata>
           <mappings>
             <mapping deploy="/p300/MiGlove" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>
-      <paths name="root@10.15.89.41:28963">
+      <paths name="node29">
         <serverdata>
           <mappings>
             <mapping deploy="/p300/MiGlove" local="$PROJECT_DIR$" web="/" />

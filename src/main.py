@@ -22,6 +22,7 @@ from template import *
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--batch_size', type=int, default=200, help="mi batch_size")
     parser.add_argument('--task', type=str, default='probe', help="probe or just eval graph embeddings")
     parser.add_argument('--mode', type=str, default='toy', help="use which dataset to train")
     parser.add_argument('--epoch', type=int, default=200, help="max state of GNN model")
@@ -38,7 +39,7 @@ if __name__ == '__main__':
 # set device
 use_cuda = torch.cuda.is_available()
 if use_cuda:
-    torch.cuda.set_device(args.gpu)
+    torch.cuda.set_device(args.gpu )
 
 # construct graph
 train_path = '/p300/MiGlove/atomic2020/event_center/forgraph/processed_train_split_graph1.txt'
