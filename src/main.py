@@ -12,18 +12,18 @@ import itertools
 from createGraph import construct_graph
 import scipy.sparse as sp
 from models import *
-from gensim.models import Word2Vec
 import networkx as nx
 from utils import random_walks
 import tqdm
 from sklearn.metrics import roc_auc_score
 from probe import *
 from template import *
+from eval_func import gen_deepwalkemb, test_embedding
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--pretrained_models', type=str, default='bert-base-uncased', help="pretrain models")
-    parser.add_argument('--batch_size', type=int, default=200, help="mi batch_size")
+    parser.add_argument('--batch_size', type=int, default=2048, help="mi batch_size")
     parser.add_argument('--task', type=str, default='probe', help="probe or just eval graph embeddings")
     parser.add_argument('--mode', type=str, default='toy', help="use which dataset to train")
     parser.add_argument('--epoch', type=int, default=200, help="max state of GNN model")
@@ -36,6 +36,7 @@ if __name__ == '__main__':
     parser.add_argument("--hidden_size", type=int, default=64, help="probe hidden size")
     parser.add_argument("--nonlinear", type=str, default='sigmoid', help="nonlinear")
     parser.add_argument("--baselines", type=bool, default=True, help="whether calculate baselines of MI")
+    parser.add_argument('--onlybaseline', type=bool, default= False, help="only gg and gr")
     args = parser.parse_args()
 
 # set device
@@ -104,36 +105,37 @@ if (args.method == 'graphsage' or args.method == 'nmp'):
         test_pos_g = test_pos_g.to(args.gpu)
         test_neg_g = test_neg_g.to(args.gpu)
 
-if args.method == 'deepwalk':
-    src, tgt = train_g.edges()
-    local_graph = nx.Graph()
-    ge_vec = []
-    for i in range(len(src)):
-        local_graph.add_edge(int(src[i]), int(tgt[i]))
-    local_walks = random_walks(local_graph, 100, 10)
-    local_walks = local_walks
-    local_idx = []
-    print(len(local_graph.nodes()))
-    for node in local_graph.nodes():
-        local_idx.append(str(node))
-    if len(local_idx) > 1:
-        local_model = Word2Vec(local_walks,
-                               size=128,
-                               window=2,
-                               min_count=0,
-                               sg=1,
-                               hs=1,
-                               workers=20)
-        local_model = local_model
-        local_vec = local_model.wv[local_idx]
-    else:
-        local_vec = np.zeros((1, 128))
-    # save graph embeddings (global + local)
-    # global_vec = global_model.wv[global_idx]
-    # ge_vec.append(np.concatenate((global_vec, local_vec), axis=1))
-    print(len(local_vec))
-    node_embedding = torch.Tensor(local_vec)
+if (args.method == 'deepwalk'):
+    adj = sp.coo_matrix((np.ones(len(u)), (u.numpy(), v.numpy())), shape=(g.number_of_nodes(), g.number_of_nodes()))
+    adj_neg = 1 - adj.todense()
+    adj_neg = adj_neg - np.eye(g.number_of_nodes())
+    neg_u, neg_v = np.where(adj_neg != 0)
 
+    neg_eids = np.random.choice(len(neg_u), g.number_of_edges() // 2)
+    test_neg_u, test_neg_v = neg_u[neg_eids[:test_size]], neg_v[neg_eids[:test_size]]
+    train_neg_u, train_neg_v = neg_u[neg_eids[test_size:]], neg_v[neg_eids[test_size:]]
+
+    train_g = dgl.remove_edges(g, eids[:test_size])
+    # print(train_g.num_nodes())
+    train_pos_g = dgl.graph((train_pos_u, train_pos_v), num_nodes=g.number_of_nodes())
+    train_neg_g = dgl.graph((train_neg_u, train_neg_v), num_nodes=g.number_of_nodes())
+
+    test_pos_g = dgl.graph((test_pos_u, test_pos_v), num_nodes=g.number_of_nodes())
+    test_neg_g = dgl.graph((test_neg_u, test_neg_v), num_nodes=g.number_of_nodes())
+    # move to gpu
+    if use_cuda:
+        g = g.to(args.gpu)
+        train_g = train_g.to(args.gpu)
+        train_pos_g = train_pos_g.to(args.gpu)
+        train_neg_g = train_neg_g.to(args.gpu)
+        test_pos_g = test_pos_g.to(args.gpu)
+        test_neg_g = test_neg_g.to(args.gpu)
+
+if args.method == 'deepwalk':
+    train_emb = gen_deepwalkemb(train_g)
+    # eval and test
+    test_embedding(args, train_emb, train_g, train_pos_g, train_neg_g, test_pos_g, test_neg_g)
+    node_embedding = train_emb.to(args.gpu)
 
 if args.method == 'graphsage':
     # Define Model
@@ -232,11 +234,11 @@ if args.task == 'probe':
     old_lines, new_lines, src_b, src_e, tgt_b, tgt_e = get_node_ids(old_path, new_path)
 
     # 得到bert embbeddings
-    if os.path.exists(args.mode + "0qweqweqw601new_bert_embedding.pt"):
-        bert_embs = torch.load(args.mode + "0601new_bert_embedding.pt")
+    if os.path.exists(args.mode + "0610new_bert_embedding.pt"):
+        bert_embs = torch.load(args.mode + "0610new_bert_embedding.pt")
     else:
         bert_embs = get_bert_embedding(new_lines, args)
-        torch.save(bert_embs, args.mode + "0601 new_bert_embedding.pt")
+        torch.save(bert_embs, args.mode + "0610new_bert_embedding.pt")
     old_lines, node2id, id2node, edge2id, edgelist = read_data(old_path)
     # 取出node embeddings
     for i in range(len(bert_embs)):
@@ -249,4 +251,14 @@ if args.task == 'probe':
     bert_embedding = bert_embs
     #probe
     # graph -> node_embedding; bert -> bert_embedding
-    probe_plain(args, node_embedding, bert_embedding)
+    res = probe_plain(args, node_embedding, bert_embedding)
+
+    # save reslut
+    path_file_name = '/p300/MiGlove/src/result.txt'
+    if not os.path.exists(path_file_name):
+        fileObject = open('/p300/MiGlove/src/result.txt', 'w', encoding='utf-8')
+    else:
+        fileObject = open('/p300/MiGlove/src/result.txt', 'a', encoding='utf-8')
+    fileObject.write(res + args.mode + ' ' + args.method + ' ' + args.mimethod + ' ' + str(args.milr) + ' ' + str(args.hidden_size)+ ' ' + str(args.batch_size))
+    fileObject.write('\n')
+    fileObject.close()

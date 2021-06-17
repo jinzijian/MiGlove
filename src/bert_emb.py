@@ -19,6 +19,7 @@ def get_bert_embedding(lines, args):
     # 载入模型
     model = BertModel.from_pretrained(prepath)
     use_cuda = args.gpu >= 0 and torch.cuda.is_available()
+    use_cuda = False
     if model_name == 'bert-base-uncased':
         layers_num = 13
     if use_cuda:
