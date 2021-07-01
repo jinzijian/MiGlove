@@ -1,4 +1,5 @@
 # coding:utf-8
+import sklearn
 import dgl
 import torch
 import os
@@ -142,7 +143,7 @@ if args.method == 'graphsage':
     model = GraphSAGE(train_g.ndata['feats'].squeeze().shape[1], 128)
     model = model.to(args.gpu)
     # You can replace DotPredictor with MLPPredictor.
-    # pred = MLPPredictor(16)
+    #pred = MLPPredictor(128)
     pred = DotPredictor()
     pred = pred.to(args.gpu)
     optimizer = torch.optim.Adam(itertools.chain(model.parameters(), pred.parameters()), lr=args.lr)
@@ -218,6 +219,10 @@ if args.method == 'nmp':
         print(h.type())
         print(h.size())
     node_embedding = h
+    node_embedding = node_embedding.cpu()
+    node_embedding = sklearn.preprocessing.normalize(node_embedding)
+    node_embedding = torch.from_numpy(node_embedding).float()
+    node_embedding = node_embedding.to(args.gpu)
 
 
 if args.task == 'probe':
