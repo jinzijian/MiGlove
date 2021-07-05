@@ -20,6 +20,7 @@ from sklearn.metrics import roc_auc_score
 from probe import *
 from template import *
 from eval_func import gen_deepwalkemb, test_embedding
+from sklearn.preprocessing import StandardScaler
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -38,12 +39,15 @@ if __name__ == '__main__':
     parser.add_argument("--nonlinear", type=str, default='sigmoid', help="nonlinear")
     parser.add_argument("--baselines", type=bool, default=True, help="whether calculate baselines of MI")
     parser.add_argument('--onlybaseline', type=bool, default= False, help="only gg and gr")
+    parser.add_argument('--noglove', type=bool, default=False, help="without using glove")
+    parser.add_argument('--norelation', type=bool, default=False, help="without using glove")
+    parser.add_argument('--g_hiddensize', type=int, default=128, help="hidden size of GNN method")
     args = parser.parse_args()
 
 # set device
 use_cuda = torch.cuda.is_available()
 if use_cuda:
-    torch.cuda.set_device(args.gpu )
+    torch.cuda.set_device(args.gpu)
 
 # construct graph
 train_path = '/p300/MiGlove/atomic2020/event_center/forgraph/processed_train_split_graph1.txt'
@@ -106,6 +110,7 @@ if (args.method == 'graphsage' or args.method == 'nmp'):
         test_pos_g = test_pos_g.to(args.gpu)
         test_neg_g = test_neg_g.to(args.gpu)
 
+
 if (args.method == 'deepwalk'):
     adj = sp.coo_matrix((np.ones(len(u)), (u.numpy(), v.numpy())), shape=(g.number_of_nodes(), g.number_of_nodes()))
     adj_neg = 1 - adj.todense()
@@ -138,9 +143,18 @@ if args.method == 'deepwalk':
     test_embedding(args, train_emb, train_g, train_pos_g, train_neg_g, test_pos_g, test_neg_g)
     node_embedding = train_emb.to(args.gpu)
 
+if args.norelation:
+    edata = train_g.edata['feats']
+    train_g.edata['feats'] = torch.randn(edata.size()).to(args.gpu)
+
+if args.noglove:
+    ndata = train_g.ndata['feats']
+    edata = train_g.edata['feats']
+    #train_g.ndata['feats'] = torch.randn(ndata.size()).to(args.gpu)
+    train_g.edata['feats'] = torch.randn(edata.size()).to(args.gpu)
 if args.method == 'graphsage':
     # Define Model
-    model = GraphSAGE(train_g.ndata['feats'].squeeze().shape[1], 128)
+    model = GraphSAGE(train_g.ndata['feats'].squeeze().shape[1], args.g_hiddensize)
     model = model.to(args.gpu)
     # You can replace DotPredictor with MLPPredictor.
     #pred = MLPPredictor(128)
@@ -170,6 +184,7 @@ if args.method == 'graphsage':
     with torch.no_grad():
         pos_score = pred(test_pos_g, h)
         neg_score = pred(test_neg_g, h)
+        auc = compute_auc(pos_score, neg_score)
         print('AUC', compute_auc(pos_score, neg_score))
     # ----------- get node emb --------------------------------
     # evaluate model:
@@ -181,7 +196,7 @@ if args.method == 'graphsage':
     node_embedding = h
 
 if args.method == 'nmp':
-    model = NMP(train_g.ndata['feats'].squeeze().shape[1], 128, train_g.edata['feats'].squeeze().shape[1])
+    model = NMP(train_g.ndata['feats'].squeeze().shape[1], args.g_hiddensize, train_g.edata['feats'].squeeze().shape[1])
     pred = DotPredictor()
     model = model.to(args.gpu)
     pred = pred.to(args.gpu)
@@ -211,6 +226,7 @@ if args.method == 'nmp':
     with torch.no_grad():
         pos_score = pred(test_pos_g, h)
         neg_score = pred(test_neg_g, h)
+        auc = compute_auc(pos_score, neg_score)
         print('AUC', compute_auc(pos_score, neg_score))
         # evaluate model:
     model.eval()

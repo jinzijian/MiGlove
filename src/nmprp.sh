@@ -1,0 +1,1 @@
+/root/anaconda3/envs/new_env/bin/python3.6 main.py --gpu 0 --mimethod mine --method nmp --task probe --batch_size 2048 --repeat 15 --nonlinear elu --hidden_size 128 --lr 1e-2 --milr 5e-5 --epoch 1000 --mode sample
