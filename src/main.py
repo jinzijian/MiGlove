@@ -1,4 +1,5 @@
 # coding:utf-8
+import random
 import sklearn
 import dgl
 import torch
@@ -14,7 +15,7 @@ from createGraph import construct_graph
 import scipy.sparse as sp
 from models import *
 import networkx as nx
-from utils import random_walks
+from utils import random_walks, setup_seed
 import tqdm
 from sklearn.metrics import roc_auc_score
 from probe import *
@@ -42,7 +43,16 @@ if __name__ == '__main__':
     parser.add_argument('--noglove', type=bool, default=False, help="without using glove")
     parser.add_argument('--norelation', type=bool, default=False, help="without using glove")
     parser.add_argument('--g_hiddensize', type=int, default=128, help="hidden size of GNN method")
+    parser.add_argument('--seed', type=int, default=10, help="random seed")
     args = parser.parse_args()
+    #set seed
+    random.seed(args.seed)
+    os.environ['PYTHONHASHSEED'] = str(args.seed)
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+    torch.cuda.manual_seed(args.seed)
+    torch.cuda.manual_seed_all(args.seed)
+    torch.backends.cudnn.deterministic = True
 
 # set device
 use_cuda = torch.cuda.is_available()
@@ -150,7 +160,7 @@ if args.norelation:
 if args.noglove:
     ndata = train_g.ndata['feats']
     edata = train_g.edata['feats']
-    #train_g.ndata['feats'] = torch.randn(ndata.size()).to(args.gpu)
+    train_g.ndata['feats'] = torch.randn(ndata.size()).to(args.gpu)
     train_g.edata['feats'] = torch.randn(edata.size()).to(args.gpu)
 if args.method == 'graphsage':
     # Define Model
@@ -242,6 +252,11 @@ if args.method == 'nmp':
 
 
 if args.task == 'probe':
+    # set seed
+    random.seed()
+    os.environ['PYTHONHASHSEED'] = 'random'
+    np.random.seed()
+    torch.backends.cudnn.deterministic = False
     # get bert embeddings
     bert_embedding = torch.randn(g.num_nodes(), 768)
     if args.mode == 'toy':
@@ -280,6 +295,11 @@ if args.task == 'probe':
         fileObject = open('/p300/MiGlove/src/result.txt', 'w', encoding='utf-8')
     else:
         fileObject = open('/p300/MiGlove/src/result.txt', 'a', encoding='utf-8')
-    fileObject.write(res + args.mode + ' ' + args.method + ' ' + args.mimethod + ' ' + str(args.milr) + ' ' + str(args.hidden_size)+ ' ' + str(args.batch_size))
+    if args.norelation:
+        fileObject.write('no relation' + res + args.mode + ' ' + args.method + ' ' + args.mimethod + ' ' + str(args.milr) + ' ' + str(args.hidden_size) + ' ' + str(args.batch_size))
+    elif args.noglove:
+        fileObject.write('no glove' + res + args.mode + ' ' + args.method + ' ' + args.mimethod + ' ' + str(args.milr) + ' ' + str(args.hidden_size) + ' ' + str(args.batch_size))
+    else:
+        fileObject.write(res + args.mode + ' ' + args.method + ' ' + args.mimethod + ' ' + str(args.milr) + ' ' + str(args.hidden_size)+ ' ' + str(args.batch_size))
     fileObject.write('\n')
     fileObject.close()

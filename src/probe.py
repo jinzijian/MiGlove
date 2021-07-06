@@ -223,6 +223,9 @@ def probe_func_probe(args, graph_emb, bert_emb, uncontext=False):
         print('3.1 start to calculate baselines of MI...')
         # calculate MI baselines
         for r in range(args.repeat):
+            torch.manual_seed(r)
+            torch.cuda.manual_seed(r)
+            torch.cuda.manual_seed_all(r)
             tmp_mir = mi_probe(args, graph_emb, bert_emb[0], s_num, 'lower')
             tmp_mig = mi_probe(args, graph_emb, bert_emb[0], s_num, 'upper')
             # get sum value
@@ -240,6 +243,9 @@ def probe_func_probe(args, graph_emb, bert_emb, uncontext=False):
 
         if uncontext:
             for r in range(args.repeat):
+                torch.manual_seed(r)
+                torch.cuda.manual_seed(r)
+                torch.cuda.manual_seed_all(r)
                 tmp_mib = mi_probe(args, graph_emb, bert_emb, s_num, bert_layers_num - 1)
                 if len(mib[-1]) == 0:
                     mib[-1] = tmp_mib
@@ -252,6 +258,9 @@ def probe_func_probe(args, graph_emb, bert_emb, uncontext=False):
                 print(l)
                 # bert_emb = np.load(bert_emb_paths[l], allow_pickle=True)
                 for r in range(args.repeat):
+                    torch.manual_seed(r)
+                    torch.cuda.manual_seed(r)
+                    torch.cuda.manual_seed_all(r)
                     tmp_mib = mi_probe(args, graph_emb, bert_emb[l], s_num, l)
                     if len(mib[l]) == 0:
                         mib[l] = tmp_mib

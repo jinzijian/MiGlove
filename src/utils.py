@@ -1,5 +1,8 @@
 import numpy as np
 import os
+import torch
+import random
+
 def make_glove_embed(glove_path, i2t, embed_dim='100'):
     glove = {}
     vecs = [] # use to produce unk
@@ -67,3 +70,11 @@ def random_walks(G, num_walks=100, walk_len=10, string_nid=False):
                 paths.append(tmp_path)
 
     return paths
+
+
+def setup_seed(seed):
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    np.random.seed(seed)
+    random.seed(seed)
+    torch.backends.cudnn.deterministic = True
