@@ -1,0 +1,292 @@
+get wet	reason	forgot umbrella	
+attend school	reason	have to	
+attend school	reason	learning never ends	
+become more clean	reason	take shower	
+bring in verdict	reason	go home	
+buy coffee	reason	have run out of	
+buy food	reason	garden not producing much	
+catch mumps	reason	stay home from school	
+catch mumps	reason	stay in bed	
+celebrate	reason	celebration good	
+celebrate	reason	christ rose from dead	
+celebrate	reason	got married	
+celebrate	reason	got promotion	
+celebrate	reason	had new baby	
+celebrate	reason	special occassion	
+christmas shop	reason	have children	
+clean	reason	dirt can make ill	
+clean	reason	don't like dirtiness	
+cook dinner	reason	girlfriend was coming over	
+cook dinner	reason	have little rice left	
+cook dinner	reason	im hungry	
+cook dinner	reason	you're hungry	
+cook meal	reason	foods better cooked	
+cook meal	reason	interesting to cook	
+cook meal	reason	was dinner time	
+cook meal	reason	you're hungy	
+cool off	reason	not hot anymore	
+cool off	reason	were sweating and hot	
+cool off	reason	you're hot	
+cough	reason	of cold	
+cough	reason	throat scratching	
+create art	reason	feel angry	
+cry	reason	got injured	
+cry	reason	were sad	
+cut hair	reason	had job interview	
+cut hair	reason	hair long	
+cut hair	reason	hair too long	
+cut hair	reason	it's too long	
+cut hair	reason	too long	
+dance	reason	am happy	
+dance	reason	like dancing	
+dance	reason	liked dancing	
+dance	reason	listening to good music	
+dance	reason	music great	
+dance	reason	music inspires	
+die	reason	get shot	
+die	reason	hadn't had food	
+die	reason	have head cut	
+die	reason	heart stopped beating	
+die	reason	heart stops beating	
+die	reason	kill yourself	
+die	reason	lost too much blood	
+die	reason	of disease	
+die	reason	were shot	
+dream	reason	sleep well	
+drink alcohol	reason	was in punch	
+drink alcohol	reason	you're stupid	
+drive car	reason	cities not designed for walking	
+drive car	reason	it's too far to walk	
+drive car	reason	like driving	
+drive car	reason	own method of transportation	
+eat breakfast	reason	it's habit	
+eat candy	reason	crave sugar	
+eat dinner	reason	am ravished	
+eat dinner	reason	was after six pm	
+eat dinner	reason	were invited to dinner	
+eat ice cream	reason	hot day	
+eat ice cream	reason	ice cream very tasty	
+eat ice cream	reason	like taste	
+eat ice cream	reason	like way tastes	
+eat ice cream	reason	love chocolate	
+eat ice cream	reason	tastes good	
+eat ice cream	reason	were hungry	
+eat ice cream	reason	you're hungry	
+eat lunch	reason	hungry around noon	
+eat lunch	reason	too early for dinner	
+eat quickly	reason	behind schedule	
+eat quickly	reason	late for work	
+eat quickly	reason	very hungry	
+fall	reason	avoid steppin	
+fall	reason	experience of weightlessness	
+fall	reason	hit ground	
+fall	reason	hurt yourself	
+fall	reason	ladder broke	
+fall	reason	might have lost step	
+fall	reason	too much	
+fall	reason	tripped over	
+fall	reason	tripped over dead body	
+fall	reason	were in high place	
+fart	reason	have gas	
+fart	reason	have gas in body	
+fart	reason	have gases	
+fart	reason	of high amounts of gas	
+fart	reason	sometimes uncontrolable	
+get	reason	ran out of	
+get clean	reason	being dirty uncomfortable	
+get clean	reason	dirt causes olfactory pain	
+get clean	reason	dislike dirt	
+get clean	reason	good hygiene important to health	
+get drunk	reason	don't know limits	
+get drunk	reason	drank lot of alcohol	
+get drunk	reason	drink too much alcohol	
+get drunk	reason	feel odd	
+get drunk	reason	hated life	
+get fat	reason	eat too much	
+get warm	reason	being cold uncomfortable	
+get warm	reason	cold outside	
+get warm	reason	heater on	
+get warm	reason	lowered thermostat	
+get warm	reason	sat close to fire	
+get warm	reason	sit close to fire	
+get warm	reason	were cold	
+get warm	reason	you're cold	
+get wet	reason	baby vomited on	
+get wet	reason	fell in lake	
+get wet	reason	have bath	
+get wet	reason	of standing in rain	
+get wet	reason	play in water	
+get wet	reason	take bath or shower	
+get wet	reason	take shower	
+get wet	reason	taking bath	
+get wet	reason	were in water	
+get wet	reason	were just in water	
+go for walk	reason	have destination	
+go for walk	reason	weather nice	
+go home	reason	were tired	
+go somewhere	reason	like people there	
+go to baseball game	reason	like sports	
+go to bed	reason	have to get up early	
+go to church	reason	believe in god	
+go to grocery store	reason	grocery stores air conditioned	
+go to jail	reason	were guilty of crime	
+go to opera	reason	love singing	
+go to party	reason	were invited	
+go to restaurant	reason	were to lazy too cook	
+go to school	reason	humans learn at school	
+go to school	reason	law requires	
+go to school	reason	parents force to	
+go to school	reason	parents valued education	
+go to school	reason	school compulsory	
+go to sleep	reason	have been up late	
+go to sleep	reason	have nothing else to do	
+go to sleep	reason	took sleeping pill	
+go to sleep	reason	took tranquilizers	
+go to work	reason	desire money	
+go to work	reason	of forced servitude	
+go wild	reason	dog has eaten shoes	
+have fun	reason	get laid	
+have fun	reason	it's good for health	
+have haircut	reason	spend money	
+have nervous breakdown	reason	go crazy	
+hear music	reason	have ears	
+hear music	reason	neighbor playing loud music	
+hear music	reason	was playing	
+hear news	reason	radio on	
+hear news	reason	tv was on	
+help	reason	have compassion for	
+help	reason	were able to help	
+hike	reason	love nature	
+laugh	reason	caught drift	
+laugh	reason	heard good joke	
+laugh	reason	told funny joke	
+laugh	reason	told joke	
+leave	reason	don't like being there	
+listen	reason	communication important	
+listen	reason	like what hear	
+listen to music	reason	music beautiful	
+listen to music	reason	people like music	
+live life	reason	have no other choice	
+live life	reason	have strong survival instinct	
+lose weight	reason	doctor told to	
+lose weight	reason	had gone on diet	
+lose weight	reason	people laught at	
+lose weight	reason	think weigh too much	
+lose weight	reason	were unwell	
+lose weight	reason	you're fat	
+make bread	reason	i'm hungry	
+masturbate	reason	have no partner	
+pay cash	reason	credit cards not accepted	
+pay cash	reason	credit charges interest on purchases	
+pay cash	reason	don't have credit card	
+pay cash	reason	don't like being in debt	
+pay cash	reason	have no credit	
+plan vacation	reason	tired of working	
+play ball	reason	it's long lazy saturday afternoon	
+play ball	reason	on team	
+play baseball	reason	like to bat	
+play basketball	reason	fun sport	
+play basketball	reason	have energy to burn	
+play basketball	reason	love game	
+play basketball	reason	tall like mike or shaq	
+play football	reason	on team	
+play frisbee	reason	do at beach	
+play frisbee	reason	like playing frisbee	
+play guitar	reason	like rock music	
+play guitar	reason	part of band	
+play hockey	reason	fewer teeth	
+play piano	reason	like music	
+play piano	reason	mother said so	
+play poker	reason	have debts	
+play soccer	reason	sports healthful	
+play tennis	reason	like tennis	
+play tennis	reason	wife likes	
+play violin	reason	fine musician	
+play violin	reason	like music	
+play violin	reason	music enjoyable	
+pray	reason	you're scared	
+read book	reason	escape and grow	
+read book	reason	like to read	
+read magazine	reason	article in interests	
+read magazine	reason	interested in subject	
+relax	reason	have done good job	
+relax	reason	of massage	
+rest	reason	felt tired	
+rest	reason	have been working hard	
+rest	reason	were tired	
+run	reason	in hurry	
+run	reason	mean dog chasing	
+run	reason	were scared	
+run	reason	were wound up	
+run	reason	you're in running race	
+run out of steam	reason	did not eat breakfast	
+run out of steam	reason	have exerted physical energy	
+run out of steam	reason	have no desire left	
+run out of steam	reason	used up water	
+run out of steam	reason	were exhausted	
+run out of steam	reason	work too hard	
+shop	reason	have no clothes	
+sign contract	reason	offered special rights	
+sing	reason	had good voice	
+sing	reason	in choir	
+sit down	reason	feet hurt	
+sit down	reason	feet in pain	
+sit down	reason	tired of standing	
+sit quietly	reason	in church	
+sit quietly	reason	parents told to	
+sit quietly	reason	teacher talking	
+sleep	reason	body requires	
+sleep	reason	feel tired	
+sleep	reason	have long day tomorrow	
+sleep	reason	working very hard makes tires	
+sleep	reason	you're tired	
+sleep at night	reason	can't sleep during day	
+sleep at night	reason	had busy day	
+sleep at night	reason	must work at day	
+smile	reason	good had just happened	
+sneeze	reason	allergic to	
+sneeze	reason	nose tickles	
+sneeze	reason	of cold	
+snore	reason	am in deep sleep	
+spend money	reason	at mall	
+spend money	reason	have atm card	
+spend money	reason	have lot of money	
+stand in line	reason	too many people waiting	
+stand in line	reason	wait turn	
+start family	reason	have sex	
+start family	reason	love children	
+stay healthy	reason	being sick sucks	
+stay healthy	reason	being sick unpleasant	
+stay healthy	reason	exercised every day	
+stay home	reason	of cold	
+stay up late	reason	cannot sleep	
+swim	reason	avoid drowning	
+swim	reason	enjoy swimming	
+swim	reason	hot outside	
+swim	reason	in water	
+swim	reason	like water	
+swim	reason	water cool and wet	
+take shower	reason	feel dirty	
+take shower	reason	hair dirty	
+take shower	reason	smell bad	
+talk	reason	am bored in party	
+talk	reason	have to say	
+talk	reason	like to	
+tape television show	reason	go out to dinner	
+think	reason	you are	
+turn around	reason	tapped on shoulder	
+vomit	reason	drank poison	
+walk	reason	car has broken down	
+walk	reason	do not have car	
+walk	reason	have legs	
+walk	reason	have no car	
+walk	reason	weather nice	
+watch television	reason	you're bored	
+watch tv	reason	favorite program on	
+watch tv	reason	simpsons on	
+get clean	reason	expected	
+play	reason	bored	
+play frisbee	reason	bored	
+read book	reason	bored	
+read magazine	reason	bored	
+watch television	reason	bored	

@@ -60,4 +60,6 @@ def test_embedding(args, train_emb, train_g, train_pos_g, train_neg_g, test_pos_
     with torch.no_grad():
         pos_score = pred(test_pos_g, h)
         neg_score = pred(test_neg_g, h)
+        auc = compute_auc(pos_score, neg_score)
         print('AUC', compute_auc(pos_score, neg_score))
+    return auc
