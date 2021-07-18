@@ -23,12 +23,30 @@ from template import *
 from eval_func import gen_deepwalkemb, test_embedding
 from sklearn.preprocessing import StandardScaler
 
+class NegativeSampler(object):
+    def __init__(self, g, k, neg_share=False):
+        self.weights = g.in_degrees().float() ** 0.75
+        self.k = k
+        self.neg_share = neg_share
+
+    def __call__(self, g, eids):
+        src, _ = g.find_edges(eids)
+        n = len(src)
+        if self.neg_share and n % self.k == 0:
+            dst = self.weights.multinomial(n, replacement=True)
+            dst = dst.view(-1, 1, self.k).expand(-1, self.k, -1).flatten()
+        else:
+            dst = self.weights.multinomial(n*self.k, replacement=True)
+        src = src.repeat_interleave(self.k)
+        return src, dst
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--pretrained_models', type=str, default='bert-base-uncased', help="pretrain models")
     parser.add_argument('--batch_size', type=int, default=2048, help="mi batch_size")
     parser.add_argument('--g_batch_size', type=int, default=20, help="graph batch_size")
-    parser.add_argument('--num_workers', type=int, default=20, help="num workers")
+    parser.add_argument('--num_workers', type=int, default=1, help="num workers")
     parser.add_argument('--task', type=str, default='probe', help="probe or just eval graph embeddings")
     parser.add_argument('--mode', type=str, default='toy', help="use which dataset to train")
     parser.add_argument('--epoch', type=int, default=200, help="max state of GNN model")
@@ -111,36 +129,27 @@ print('1')
 
 
 n_edges = g.num_edges()
-train_seeds = 1
+train_seeds = torch.arange(n_edges)
+u, v = torch.tensor([0, 0, 0, 1]), torch.tensor([1, 2, 3, 3])
+g = dgl.graph((u, v))
+n_edges = g.num_edges()
+train_seeds = torch.arange(n_edges)
 sampler = dgl.dataloading.MultiLayerFullNeighborSampler(2)
-gdataloader = dgl.dataloading.EdgeDataLoader(
-    train_g, train_seeds, sampler,
-    negative_sampler=dgl.dataloading.negative_sampler.Uniform(5),
-    batch_size=args.g_batch_size,
-    shuffle=True,
-    drop_last=False,
-    pin_memory=True,
-    num_workers=args.num_workers)
+dataloader = dgl.dataloading.EdgeDataLoader(
+        g, train_seeds, sampler, exclude='reverse_id',
+        # For each edge with ID e in Reddit dataset, the reverse edge is e ± |E|/2.
+        reverse_eids=torch.cat([
+            torch.arange(n_edges // 2, n_edges),
+            torch.arange(0, n_edges // 2)]).to(train_seeds),
+        negative_sampler=NegativeSampler(g, 2,2),
+        batch_size=args.batch_size,
+        shuffle=True,
+        drop_last=False,
+        num_workers=args.num_workers)
 print('ok')
-model = GraphSAGE(train_g.ndata['feats'].squeeze().shape[1], args.g_hiddensize)
-model = model.to(args.gpu)
-# You can replace DotPredictor with MLPPredictor.
-#pred = MLPPredictor(128)
-pred = DotPredictor()
-pred = pred.to(args.gpu)
-optimizer = torch.optim.Adam(itertools.chain(model.parameters(), pred.parameters()), lr=args.lr)
-print('2')
-#data1 = gdataloader[1]
-for input_nodes, positive_graph, negative_graph, blocks in gdataloader:
-    print('start train')
+for batch, (input_nodes, positive_graph, negative_graph, blocks) in enumerate(dataloader):
+    print('start')
     blocks = [b.to(torch.device('cuda')) for b in blocks]
     positive_graph = positive_graph.to(torch.device('cuda'))
     negative_graph = negative_graph.to(torch.device('cuda'))
-    input_features = blocks[0].srcdata['features']
-    print('3')
-    pos_score, neg_score = model(positive_graph, negative_graph, blocks, input_features)
-    loss = compute_loss(pos_score, neg_score)
-    print(loss)
-    optimizer.zero_grad()
-    loss.backward()
-    optimizer.step()
+print('finish')
