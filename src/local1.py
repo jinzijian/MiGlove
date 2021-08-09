@@ -49,9 +49,9 @@ if __name__ == '__main__':
     parser.add_argument('--num_workers', type=int, default=0, help="num workers")
     parser.add_argument('--task', type=str, default='probe', help="probe or just eval graph embeddings")
     parser.add_argument('--mode', type=str, default='toy', help="use which dataset to train")
-    parser.add_argument('--epoch', type=int, default=1000, help="max state of GNN model")
+    parser.add_argument('--epoch', type=int, default=200, help="max state of GNN model")
     parser.add_argument("--gpu", type=int, default=1, help="gpu")
-    parser.add_argument("--lr", type=float, default=1e-3, help="learning rate")
+    parser.add_argument("--lr", type=float, default=1e-4, help="learning rate")
     parser.add_argument("--method", type=str, default='graphsage', help="the method to get graph embeddings")
     parser.add_argument("--repeat", type=int, default=1, help="repeat times")
     parser.add_argument("--mimethod", type=str, default='mine', help="type of mi method'")
@@ -126,10 +126,8 @@ dev_g, dev_node2id, dev_id2node, dev_edgelist, dev_word2idx, dev_idx2word, dev_n
 #
 # print('1')
 from dgl.data import RedditDataset
-print('full graph INFO')
+print('FULL GRAPH INFO')
 print(train_g)
-
-
 
 # SET dataloader
 n_edges = train_g.num_edges()
@@ -149,12 +147,13 @@ dataloader = dgl.dataloading.EdgeDataLoader(
 print('ok')
 from createGraph import getNE
 for batch, (input_nodes, positive_graph, negative_graph, blocks) in enumerate(dataloader):
-    # print(positive_graph)
-    # u1,v1=dgl.block_to_graph(blocks[0]).edges()
-    # g=dgl.graph((u1,v1))
-    # g=getNE(train_path, emb_path,g)
-    # print(g.num_edges())
-    g=positive_graph.clone()
+    print(positive_graph)
+    u1,v1=dgl.block_to_graph(blocks[0]).edges()
+    g=dgl.graph((u1,v1))
+    g = g.to(args.gpu)
+    g=getNE(args, train_path, emb_path, g)
+    print(g.num_edges())
+    # g=positive_graph.clone()
     u,v=g.edges()
     eids = np.arange(g.number_of_edges())
     eids = np.random.permutation(eids)
@@ -169,6 +168,8 @@ for batch, (input_nodes, positive_graph, negative_graph, blocks) in enumerate(da
     # get graph emb
     if (args.method == 'graphsage' or args.method == 'nmp'):
         # Find all negative edges and split them for training and testing
+        u = u.cpu()
+        v = v.cpu()
         adj = sp.coo_matrix((np.ones(len(u)), (u.numpy(), v.numpy())), shape=(g.number_of_nodes(), g.number_of_nodes()))
         adj_neg = 1 - adj.todense()
         adj_neg = adj_neg - np.eye(g.number_of_nodes())
@@ -186,7 +187,7 @@ for batch, (input_nodes, positive_graph, negative_graph, blocks) in enumerate(da
         test_neg_g = dgl.graph((test_neg_u, test_neg_v), num_nodes=g.number_of_nodes())
         # move to gpu
         if use_cuda:
-            g = g.to(args.gpu)
+            # g = g.to(args.gpu)
             train_g = train_g.to(args.gpu)
             train_pos_g = train_pos_g.to(args.gpu)
             train_neg_g = train_neg_g.to(args.gpu)

@@ -22,10 +22,10 @@ class GraphSAGE(nn.Module):
         self.conv1 = SAGEConv(in_feats, h_feats, 'mean')
         self.conv2 = SAGEConv(h_feats, h_feats, 'mean')
 
-    def forward(self, g, in_feat):
-        h = self.conv1(g, in_feat)
+    def forward(self, blocks, in_feat):
+        h = self.conv1(blocks[0], in_feat)
         h = F.relu(h)
-        h = self.conv2(g, h)
+        h = self.conv2(blocks[1], h)
         return h
 
 
@@ -89,10 +89,10 @@ class NMP(nn.Module):
         self.conv1 = NNConv(in_feats, h_feats, edge_func1, 'mean')
         self.conv2 = NNConv(h_feats, h_feats, edge_func2, 'mean')
 
-    def forward(self, g, in_feat, edge_feats):
-        h = self.conv1(g, in_feat, edge_feats)
+    def forward(self, blocks, in_feat, edge_feats, edge_feats1):
+        h = self.conv1(blocks[0], in_feat, edge_feats)
         h = F.relu(h)
-        h = self.conv2(g, h, edge_feats)
+        h = self.conv2(blocks[1], h, edge_feats1)
         return h
 
 

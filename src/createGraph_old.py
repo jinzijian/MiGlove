@@ -150,17 +150,7 @@ def construct_graph(path, emb_path) -> object:
     g.ndata['feats'] = node_feats
     g.edata['feats'] = edge_feats
     return g, node2id, id2node, edgelist, word2idx, idx2word, node_feats, edge_feats, emb_vectors
-def getNE(args, path,emb_path, g)->object:
-    lines, node2id, id2node, edge2id, edgelist = read_data(path)
-    word2idx, idx2word = get_w2iandi2w(lines)
-    temp=g.num_edges()
-    edgelist=edgelist[:temp]
-    emb_vectors = make_glove_embed(emb_path, idx2word)
-    node_feats = get_node_feats(g, emb_vectors, word2idx, idx2word, id2node).to(args.gpu)
-    edge_feats = get_edge_feats(edgelist, emb_vectors, word2idx).to(args.gpu)
-    g.ndata['feats'] = node_feats
-    g.edata['feats'] = edge_feats
-    return g
+
 
 
 if __name__ == "__main__":

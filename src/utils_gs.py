@@ -31,3 +31,19 @@ def compute_auc(pos_score, neg_score):
     labels = torch.cat(
         [torch.ones(pos_score.shape[0]), torch.zeros(neg_score.shape[0])]).numpy()
     return roc_auc_score(labels, scores)
+
+def inference(args, model, graph, inference_dataloader):
+    with torch.no_grad():
+        nodes = torch.arange(graph.number_of_nodes())
+        result = []
+        for input_nodes, output_nodes, blocks in inference_dataloader:
+            # feature copy from CPU to GPU takes place here
+            blocks = [b.to(args.gpu) for b in blocks]
+            input_node_features = blocks[0].srcdata['feats']
+            input_edge_features = blocks[0].edata['feats']
+            input_edge_features1 = blocks[1].edata['feats']
+            if args.method == 'graphsage':
+                result.append(model(blocks, input_node_features.squeeze()))
+            if args.method == 'nmp':
+                result.append(model(blocks, input_node_features.squeeze(), input_edge_features.squeeze(), input_edge_features1.squeeze()))
+        return torch.cat(result)
