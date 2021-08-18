@@ -191,7 +191,7 @@ def convertBert(old_lines, node2id, bert_embs, src_b, src_e, tgt_b, tgt_e):
         node_len = node_emb[i].shape
         if (node_len != (768,)):
             print(i)
-            print(id2node[i])
+            #print(id2node[i])
             print(node_len)
     node_emb = np.stack(node_emb, axis=0)
     bert_embedding = torch.from_numpy(node_emb)

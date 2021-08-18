@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 from sklearn.metrics import roc_auc_score, jaccard_score
-from tqdm import tqdm
+from tqdm import trange
 from models import binary_classifer
 from utils import random_walks
 from gensim.models import Word2Vec
@@ -39,7 +39,7 @@ def test_embedding(args, train_emb, train_g, train_pos_g, train_neg_g, test_pos_
     if use_cuda:
         torch.cuda.set_device(args.gpu)
     hfeats = 128
-    pred = MLPPredictor(hfeats).to(args.gpu)
+    pred = MLPPredictor4deepwalk(hfeats).to(args.gpu)
     optimizer = torch.optim.Adam(itertools.chain(pred.parameters()), lr=args.lr)
     # backward
     for e in range(args.epoch):
@@ -63,3 +63,66 @@ def test_embedding(args, train_emb, train_g, train_pos_g, train_neg_g, test_pos_
         auc = compute_auc(pos_score, neg_score)
         print('AUC', compute_auc(pos_score, neg_score))
     return auc
+
+def test_embedding_batch(args, train_dataloader, dev_dataloader, test_dataloader):
+    use_cuda = torch.cuda.is_available()
+    if use_cuda:
+        torch.cuda.set_device(args.gpu)
+    hfeats = 128
+    pred = MLPPredictor(hfeats).to(args.gpu)
+    optimizer = torch.optim.Adam(itertools.chain(pred.parameters()), lr=args.lr)
+    # backward
+    for e in range(args.epoch):
+        # forward
+        for input_nodes, positive_graph, negative_graph, blocks in train_dataloader:
+            blocks = [b.to(args.gpu) for b in blocks]
+            positive_graph = positive_graph.to(args.gpu)
+            negative_graph = negative_graph.to(args.gpu)
+            h = blocks[-1].dstdata['d']
+            pos_score = pred(positive_graph, h)
+            neg_score = pred(negative_graph, h)
+        loss = compute_loss(args, pos_score, neg_score, use_cuda)
+
+        # backward
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        if e % 5 == 0:
+            print('In epoch {}, loss: {}'.format(e, loss))
+
+    auc_res = 0
+    count = 0
+    with torch.no_grad():
+        for input_nodes, positive_graph, negative_graph, blocks in dev_dataloader:
+            blocks = [b.to(args.gpu) for b in blocks]
+            positive_graph = positive_graph.to(args.gpu)
+            negative_graph = negative_graph.to(args.gpu)
+            h = blocks[-1].dstdata['d']
+            pos_score = pred(positive_graph, h)
+            neg_score = pred(negative_graph, h)
+            auc = compute_auc(pos_score, neg_score)
+            print('AUC', compute_auc(pos_score, neg_score))
+            count += 1
+            auc_res += auc
+    final_dev_auc = auc_res / count
+
+
+
+    auc_res = 0
+    count = 0
+    with torch.no_grad():
+        for input_nodes, positive_graph, negative_graph, blocks in test_dataloader:
+            blocks = [b.to(args.gpu) for b in blocks]
+            positive_graph = positive_graph.to(args.gpu)
+            negative_graph = negative_graph.to(args.gpu)
+            h = blocks[-1].dstdata['d']
+            pos_score = pred(positive_graph, h)
+            neg_score = pred(negative_graph, h)
+            auc = compute_auc(pos_score, neg_score)
+            print('AUC', compute_auc(pos_score, neg_score))
+            count += 1
+            auc_res += auc
+    final_test_auc = auc_res/count
+
+    return final_dev_auc, final_test_auc
