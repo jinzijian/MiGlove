@@ -248,18 +248,17 @@ if args.method == 'graphsage':
     # ----------- training -------------------------------- #
     all_logits = []
     count = 0
-    for input_nodes, positive_graph, negative_graph, blocks in train_dataloader:
-        blocks = [b.to(args.gpu) for b in blocks]
-        positive_graph = positive_graph.to(args.gpu)
-        negative_graph = negative_graph.to(args.gpu)
-        input_node_features = blocks[0].srcdata['feats']
-        input_edge_features = blocks[0].edata['feats']
-        input_edge_features1 = blocks[1].edata['feats']
-        count += 1
-        print('loader %d times'%(count))
+    for e in range(args.epoch):
+        for input_nodes, positive_graph, negative_graph, blocks in train_dataloader:
+            blocks = [b.to(args.gpu) for b in blocks]
+            positive_graph = positive_graph.to(args.gpu)
+            negative_graph = negative_graph.to(args.gpu)
+            input_node_features = blocks[0].srcdata['feats']
+            input_edge_features = blocks[0].edata['feats']
+            input_edge_features1 = blocks[1].edata['feats']
+            count += 1
+            print('loader %d times'%(count))
 
-    # get graph emb
-        for e in range(args.epoch):
             # forward
             if (args.method == 'graphsage'):
                 h = model(blocks, input_node_features.squeeze())
@@ -291,17 +290,17 @@ if args.method == 'nmp':
     all_logits = []
 
     count = 0
-    for input_nodes, positive_graph, negative_graph, blocks in train_dataloader:
-        blocks = [b.to(args.gpu) for b in blocks]
-        positive_graph = positive_graph.to(args.gpu)
-        negative_graph = negative_graph.to(args.gpu)
-        input_node_features = blocks[0].srcdata['feats']
-        input_edge_features = blocks[0].edata['feats']
-        input_edge_features1 = blocks[1].edata['feats']
-        count += 1
-        print('loader %d times' % (count))
+    for e in range(args.epoch):
+        for input_nodes, positive_graph, negative_graph, blocks in train_dataloader:
+            blocks = [b.to(args.gpu) for b in blocks]
+            positive_graph = positive_graph.to(args.gpu)
+            negative_graph = negative_graph.to(args.gpu)
+            input_node_features = blocks[0].srcdata['feats']
+            input_edge_features = blocks[0].edata['feats']
+            input_edge_features1 = blocks[1].edata['feats']
+            count += 1
+            print('loader %d times' % (count))
 
-        for e in range(args.epoch):
             # forward
             if (args.method == 'graphsage'):
                 h = model(blocks, input_node_features.squeeze())
