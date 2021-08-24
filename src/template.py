@@ -10,10 +10,13 @@ import numpy as np
 
 def deal_sentence(line):
     if 'hindered by' in line[1]:
+        #print('true')
         p = line.index('hindered by')
+        #print(p)
         line[p] = 'is hindered by'
         sentence = ''
         for word in line[:-1]:
+            #print(word)
             if (word == '\n'):
                 continue
             sentence += word
@@ -112,12 +115,18 @@ def gen_sentences(old_path, new_path):
     with open(old_path, "r", encoding='utf-8') as f:
         lines = f.readlines()
     sentences = []
+    
+    print("len of lines")
     print(len(lines))
+    i = 0
     for line in lines:
+        i += 1
         line = line.split('\t')
+        if '\n' in line[2]:
+            line[2] = line[2][:-1]
+            line.append('\n')
         sentence = deal_sentence(line)
         sentences.append(sentence)
-    print(len(sentences))
     file = open(new_path, 'w', encoding='utf-8')
     for sentence in sentences:
         if (sentence.count('\n') == 2):
@@ -140,6 +149,10 @@ def get_node_ids(old_path, new_path):
         tgt_e = []
         for i in range(len(old_lines)):
             old_line = old_lines[i].split('\t')
+            if '\n' in old_line[2]:
+                old_line[2] = old_line[2][:-1]
+                old_line.append('\n')
+                old_lines[i] = '\t'.join(old_line)
             new_lines[i] = new_lines[i].lstrip()
             new_line = new_lines[i].split(' ')
             sb = find_idx(new_line, old_line[0].split(' '))
@@ -154,21 +167,33 @@ def get_node_ids(old_path, new_path):
 
 def get_node_emb(old_lines, node2id, bert_embs, src_b, src_e, tgt_b, tgt_e):
     node_emb = [[] for i in range(len(node2id))]
+    print(len(old_lines))
+    print(len(bert_embs))
     for i in range(len(old_lines)):
         line = old_lines[i]
         line = line.split('\t')
+        #print(len(line))
         bert_emb = bert_embs[i]
         src_emb = bert_emb[src_b[i]:src_e[i]]
-        tgt_emb = bert_emb[tgt_b[i]: tgt_e[i]]
+        tgt_emb = bert_emb[tgt_b[i]:tgt_e[i]]
         src = line[0]
         rel = line[1]
         tgt = line[2]
+        if tgt == '':
+            print(i)
         src_id = node2id[src]
         tgt_id = node2id[tgt]
+        if src_id == 66449:
+            print("in src")
+            print(src)
+        if tgt_id == 66449:
+            print("in tgt")
+            print(tgt)
         node_emb[src_id].append(src_emb)
         node_emb[tgt_id].append(tgt_emb)
     #convert to np
     print('converting to np')
+    #print(node2id.index(66450))
     node_emb = np.array(node_emb)
     for i in range(len(node_emb)):
         for j in range(len(node_emb[i])):
@@ -186,13 +211,26 @@ def get_node_emb(old_lines, node2id, bert_embs, src_b, src_e, tgt_b, tgt_e):
     return node_emb
 
 def convertBert(old_lines, node2id, bert_embs, src_b, src_e, tgt_b, tgt_e):
+    print('len of bert embedding:')
+    print(len(bert_embs))
+    #bert_embs.pop(76628)
     node_emb = get_node_emb(old_lines, node2id, bert_embs, src_b, src_e, tgt_b, tgt_e)
+    print(len(node_emb))
+    import numpy
     for i in range(len(node_emb)):
-        node_len = node_emb[i].shape
-        if (node_len != (768,)):
+        if isinstance(node_emb[i], numpy.ndarray):
+            continue
+        else:
+            print(type(node_emb[i]))
             print(i)
-            #print(id2node[i])
-            print(node_len)
+            print(node_emb[i])
+            #print(len(node_emb[i]))
+    # for i in range(len(node_emb)):
+    #     node_len = node_emb[i].shape
+    #     #if (node_len != (768,)):
+    #         #print(i)
+    #         #print(id2node[i])
+    #         #print(node_len)
     node_emb = np.stack(node_emb, axis=0)
     bert_embedding = torch.from_numpy(node_emb)
     return bert_embedding

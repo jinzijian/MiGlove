@@ -123,7 +123,7 @@ class NMP(nn.Module):
 
     def forward(self, blocks, in_feat, edge_feats, edge_feats1):
         h = self.conv1(blocks[0], in_feat, edge_feats)
-        h = F.relu(h)
+        h = F.elu(h)
         h = self.conv2(blocks[1], h, edge_feats1)
         return h
 

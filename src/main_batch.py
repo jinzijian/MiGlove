@@ -247,8 +247,8 @@ if args.method == 'graphsage':
     optimizer = torch.optim.Adam(itertools.chain(model.parameters(), pred.parameters()), lr=args.lr)
     # ----------- training -------------------------------- #
     all_logits = []
-    count = 0
     for e in range(args.epoch):
+        count = 0
         for input_nodes, positive_graph, negative_graph, blocks in train_dataloader:
             blocks = [b.to(args.gpu) for b in blocks]
             positive_graph = positive_graph.to(args.gpu)
@@ -257,7 +257,7 @@ if args.method == 'graphsage':
             input_edge_features = blocks[0].edata['feats']
             input_edge_features1 = blocks[1].edata['feats']
             count += 1
-            print('loader %d times'%(count))
+            #print('loader %d times'%(count))
 
             # forward
             if (args.method == 'graphsage'):
@@ -274,8 +274,8 @@ if args.method == 'graphsage':
             loss.backward()
             optimizer.step()
 
-            if e % 5 == 0:
-                print('In epoch {}, loss: {}, auc:{}'.format(e, loss, auc))
+        if e % 5 == 0:
+            print('In epoch {}, loss: {}, auc:{}'.format(e, loss, auc))
 
 
 if args.method == 'nmp':
@@ -289,8 +289,8 @@ if args.method == 'nmp':
     # ----------- training -------------------------------- #
     all_logits = []
 
-    count = 0
     for e in range(args.epoch):
+        count = 0
         for input_nodes, positive_graph, negative_graph, blocks in train_dataloader:
             blocks = [b.to(args.gpu) for b in blocks]
             positive_graph = positive_graph.to(args.gpu)
@@ -299,7 +299,7 @@ if args.method == 'nmp':
             input_edge_features = blocks[0].edata['feats']
             input_edge_features1 = blocks[1].edata['feats']
             count += 1
-            print('loader %d times' % (count))
+            #print('loader %d times' % (count))
 
             # forward
             if (args.method == 'graphsage'):
@@ -315,9 +315,9 @@ if args.method == 'nmp':
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+        if e % 5 == 0:
+            print('In epoch {}, loss: {}, auc:{}'.format(e, loss, auc))
 
-            if e % 5 == 0:
-                print('In epoch {}, loss: {}, auc:{}'.format(e, loss, auc))
 
 
     print('train finish and start dev')
@@ -468,11 +468,11 @@ if args.task == 'probe':
     else:
         fileObject = open('/p300/MiGlove/src/result.txt', 'a', encoding='utf-8')
     if args.norelation:
-        fileObject.write('no relation' + res + args.mode + ' ' + args.method + ' ' + args.mimethod + ' ' + str(args.milr) + ' ' + str(args.hidden_size) + ' ' + str(args.batch_size))
+        fileObject.write('no relation' + res + args.mode + ' ' + args.method + ' ' + args.mimethod + ' ' + str(args.milr) + ' ' + str(args.hidden_size) + ' ' + str(args.batch_size)+ ' ' + str(args.g_hiddensize))
     elif args.noglove:
-        fileObject.write('no glove' + res + args.mode + ' ' + args.method + ' ' + args.mimethod + ' ' + str(args.milr) + ' ' + str(args.hidden_size) + ' ' + str(args.batch_size))
+        fileObject.write('no glove' + res + args.mode + ' ' + args.method + ' ' + args.mimethod + ' ' + str(args.milr) + ' ' + str(args.hidden_size) + ' ' + str(args.batch_size)+ ' ' + str(args.g_hiddensize))
     elif args.nonode:
-        fileObject.write('no node' + res + args.mode + ' ' + args.method + ' ' + args.mimethod + ' ' + str(args.milr) + ' ' + str(args.hidden_size) + ' ' + str(args.batch_size))
+        fileObject.write('no node' + res + args.mode + ' ' + args.method + ' ' + args.mimethod + ' ' + str(args.milr) + ' ' + str(args.hidden_size) + ' ' + str(args.batch_size)+ ' ' + str(args.g_hiddensize))
     else:
         fileObject.write(res + args.mode + ' ' + args.method + ' ' + args.mimethod + ' ' + str(args.milr) + ' ' + str(args.hidden_size)+ ' ' + str(args.batch_size))
     fileObject.write('\n')
