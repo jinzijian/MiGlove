@@ -135,6 +135,8 @@ def get_edge_feats(edgelist, emb_vectors, word2idx):
             embb = emb_vectors[word2idx[word]]
             embeddings += embb
         embeddings = embeddings / length
+        if args.relation == edge:
+            embeddings = np.randn((1, 100))
         edge_feats.append(embeddings)
     edge_feats = torch.tensor(edge_feats, dtype=torch.float32)
     return edge_feats

@@ -66,6 +66,7 @@ if __name__ == '__main__':
     parser.add_argument('--g_hiddensize', type=int, default=128, help="hidden size of GNN method")
     parser.add_argument('--g_batch', type=int, default=1000, help="batch size of GNN method")
     parser.add_argument('--seed', type=int, default=10, help="random seed")
+    parser.add_argument('--relation', type=str, default='None', help="{'isfilledby', 'reason', 'hassubevent', 'causes', 'after', 'hinderedby', 'before'}")
     args = parser.parse_args()
     #set seed
     random.seed(args.seed)
@@ -87,7 +88,7 @@ dev_path = '/p300/MiGlove/atomic2020/event_center/forgraph/processed_dev_split_g
 emb_path = '/p300/TensorFSARNN/data/emb/glove.6B'
 # todo: Sample a small datasets to choose parameters
 if args.mode == 'train':
-    train_path = '/p300/MiGlove/atomic2020/event_center/forgraph/processed_train_split_graph1.txt'
+    train_path = '/p300/MiGlove/atomic2020/event_center/processed_train_split_graph.txt'
 if args.mode == 'toy':
     train_path = '/p300/MiGlove/atomic2020/event_center/forgraph/toy_g_train.txt'
     dev_path = '/p300/MiGlove/atomic2020/event_center/forgraph/toy_g_train.txt'
@@ -112,11 +113,11 @@ if args.mode == 'sample':
 #     train_path = '/p300/MiGlove/atomic2020/event_center/forgraph/filled.txt'
 
 train_g, train_node2id, train_id2node, train_edgelist, train_word2idx, train_idx2word, train_node_feats, train_edge_feats, train_emb_vectors =construct_graph(
-    train_path, emb_path)
+    train_path, emb_path, args)
 test_g, test_node2id, test_id2node, test_edgelist, test_word2idx, test_idx2word, test_node_feats, test_edge_feats, test_emb_vectors= construct_graph(
-    test_path, emb_path)
+    test_path, emb_path, args)
 dev_g, dev_node2id, dev_id2node, dev_edgelist, dev_word2idx, dev_idx2word, dev_node_feats, dev_edge_feats, dev_emb_vectors = construct_graph(
-    dev_path, emb_path)
+    dev_path, emb_path, args)
 
 # Split edge set for training and testing
 # g = train_g

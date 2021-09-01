@@ -116,8 +116,11 @@ class NMP(nn.Module):
     def __init__(self, in_feats, h_feats, edge_feats):
         super(NMP, self).__init__()
         self.edge_feats = edge_feats
-        edge_func1 = torch.nn.Linear(edge_feats, in_feats*h_feats)
-        edge_func2 = torch.nn.Linear(edge_feats, h_feats * h_feats)
+        m = torch.nn.ReLU(inplace=True)
+        edge_func1 = nn.Sequential(torch.nn.Linear(edge_feats, in_feats * h_feats), torch.nn.ReLU(inplace=True))
+        #edge_func1 = torch.nn.Linear(edge_feats, in_feats*h_feats)
+        edge_func2 = nn.Sequential(torch.nn.Linear(edge_feats, h_feats * h_feats), torch.nn.ReLU(inplace=True))
+        #edge_func2 = torch.nn.Linear(edge_feats, h_feats * h_feats)
         self.conv1 = NNConv(in_feats, h_feats, edge_func1, 'mean')
         self.conv2 = NNConv(h_feats, h_feats, edge_func2, 'mean')
 

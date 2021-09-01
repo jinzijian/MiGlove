@@ -124,8 +124,9 @@ def get_node_feats(g, emb_vectors, word2idx, idx2word, id2node):
 
 
 
-def get_edge_feats(edgelist, emb_vectors, word2idx):
+def get_edge_feats(edgelist, emb_vectors, word2idx, args):
     edge_feats = []
+    s = set()
     for edge in edgelist:
         edge = edge.strip('.')
         edge = edge.split(' ')
@@ -135,21 +136,29 @@ def get_edge_feats(edgelist, emb_vectors, word2idx):
             embb = emb_vectors[word2idx[word]]
             embeddings += embb
         embeddings = embeddings / length
+        edge_string = ''.join(edge)
+        if args.relation == edge_string:
+            embeddings = np.random.rand(1, 100)
+        s.add(edge_string)
         edge_feats.append(embeddings)
+    print('edge_string set')
+    print(s)
     edge_feats = torch.tensor(edge_feats, dtype=torch.float32)
     return edge_feats
 
 
-def construct_graph(path, emb_path) -> object:
+def construct_graph(path, emb_path, args) -> object:
     lines, node2id, id2node, edge2id, edgelist = read_data(path)
     word2idx, idx2word = get_w2iandi2w(lines)
     g = construct_plain_graph(lines, node2id)
     emb_vectors = make_glove_embed(emb_path, idx2word)
     node_feats = get_node_feats(g, emb_vectors, word2idx, idx2word, id2node)
-    edge_feats = get_edge_feats(edgelist, emb_vectors, word2idx)
+    edge_feats = get_edge_feats(edgelist, emb_vectors, word2idx, args)
     g.ndata['feats'] = node_feats
     g.edata['feats'] = edge_feats
     return g, node2id, id2node, edgelist, word2idx, idx2word, node_feats, edge_feats, emb_vectors
+
+
 def getNE(args, path,emb_path, g)->object:
     lines, node2id, id2node, edge2id, edgelist = read_data(path)
     word2idx, idx2word = get_w2iandi2w(lines)
